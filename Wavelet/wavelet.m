@@ -76,10 +76,6 @@
 %   routine is provided as is without any express or implied warranties
 %   whatsoever.
 %
-% Notice: Please acknowledge the use of this program in any publications:
-%   ``Wavelet software was provided by C. Torrence and G. Compo,
-%     and is available at URL: http://paos.colorado.edu/research/wavelets/''.
-%
 % Notice: Please acknowledge the use of the above software in any publications:
 %    ``Wavelet software was provided by C. Torrence and G. Compo,
 %      and is available at URL: http://paos.colorado.edu/research/wavelets/''.
@@ -96,7 +92,7 @@
 %  E-mail: torrence@ucar.edu              E-mail: gpc@cdc.noaa.gov
 %----------------------------------------------------------------------------
 function [wave,period,scale,coi] = ...
-	wavelet(Y,dt,pad,dj,s0,J1,mother,param);
+	wavelet(Y,dt,pad,dj,s0,J1,mother,param)
 
 if (nargin < 8), param = -1;, end
 if (nargin < 7), mother = -1;, end
@@ -134,8 +130,13 @@ f = fft(x);    % [Eqn(3)]
 %....construct SCALE array & empty PERIOD & WAVE arrays
 scale = s0*2.^((0:J1)*dj);
 period = scale;
+
+% Free memory
+clear Y pad dj s0 x base2 expr
+clear functions
+
 wave = zeros(floor(J1+1),n);  % define the wavelet array
-wave = wave + i*wave;  % make it complex
+wave = wave + 1i*wave;  % make it complex
 
 % loop through all scales and compute transform
 for a1 = 1:J1+1
