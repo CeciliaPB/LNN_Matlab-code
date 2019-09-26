@@ -1,6 +1,7 @@
-function wavelet_analysis(signal,time,tsegment,freq,varargin)
+function [wdata, wfreq] = wavelet_analysis(signal,time,tsegment,freq,varargin)
 
-% First read .dat to MATLAB
+% The continuous wavelet transform analysis is similar to the FFT, but
+% shows the temporal evolution of the dominant frequency.
 %
 % INPUTS: 
 %   - signal: signal to analyse, a vector
@@ -16,7 +17,10 @@ function wavelet_analysis(signal,time,tsegment,freq,varargin)
 %   - tInt: time intervals to segment before analysing, in seconds. Use as
 %           'tInt',value. NO default value, all time will be analysed.
 %
-% OUTPUTS: Results are automatically saved to .dat files named:
+% OUTPUTS: 
+%   - wdata: the WAVELET transform of signal.
+%   - wfreq: The frequency range analysed.
+% Results are automatically saved to .dat files named:
 %   - 'signal_wavelet.dat': is the WAVELET transform of signal. FLOAT(WAVE)
 %     gives the WAVELET amplitude, ATAN(IMAGINARY(WAVE),FLOAT(WAVE) gives
 %     the WAVELET phase. The WAVELET power spectrum is ABS(WAVE)^2. Its
@@ -28,15 +32,20 @@ function wavelet_analysis(signal,time,tsegment,freq,varargin)
 % corresponding section.
 % 
 % Examples: 
-% wavelet_analysis(mT,time,[100 300],[0.5 300]);
-% wavelet_analysis(mT,time,[100 300],[0.5 % 300],'fr',42,'dj',42,'n',42,...
+% To only save the data
+% wavelet_analysis(signal,time,[100 300],[0.5 300]);
+% wavelet_analysis(signal,time,[100 300],[0.5 300],'fr',42,'dj',42,'n',42,...
 %                  'mother','Morlet','tInt',42);
+% To keep the result in the workspace
+% [wdata, wfreq] = wavelet_analysis(signal,time,[100 300],[0.5 300]);
 %
 % In case of "out of memory" error, try including a tInt and pre-segment
 % the analysis.
 % 
 % -------------------------------------------------------------------------
-% Cecília Pardo-Bellver
+% Cecília Pardo-Bellver, 2019
+% Laboratory of Network Neurophysiology
+% Instinute of Experimantal Medicine, Hungary.
 %
 % Wavelet software was provided by C. Torrence and G. Compo. See wavelet
 % function for more details.
@@ -45,7 +54,7 @@ function wavelet_analysis(signal,time,tsegment,freq,varargin)
 % Optional input variables ------------------------------------------------
 % Params, defalut values:
 fr = 30000;
-dj = 0.08; % As set by Hanya B.    
+dj = 0.08; % 0.05, As set by Hanya B.    
 n = 3;
 mother = 'Morlet';
 
@@ -76,13 +85,15 @@ wave = [out,'_',num2str(tsegment(1)),'_',num2str(tsegment(2)),'_wavelet.dat'];
 f = [out,'_',num2str(tsegment(1)),'_',num2str(tsegment(2)),'_freq.dat']; 
 
 % Keep definig params
-dt = 1/fr/n;
+dt = 1/fr/n; % amount of time between each Y value, i.e. the sampling time.
 p0 = 1/freq(1);
 pn = 1/freq(2);
-s0 = pn/1.03;
+s0 = pn/1.03; % the smallest scale of the wavelet.  Default is 2*DT.
 sn = p0/1.03;
 pad = 1;
-j1 = log2(sn/s0)/dj;
+j1 = log2(sn/s0)/dj; %the # of scales minus one. Scales range from S0 up to S0*2^(J1*DJ),
+%        to give a total of (J1+1) scales. Default is J1 = (LOG2(N DT/S0))/DJ.
+
 %     % Wavelet params as set by Hanya B
 %     dt = 1 / fr/n;
 %     pad = 1;  
@@ -145,7 +156,7 @@ for ii = 1:size(tArray,1)
         
         fid = fopen(f,'w+');    
         fwrite(fid,fq(:,:),'int16'); % Remember the data type to open it.
-        fclose(fid);        
+        fclose(fid);
     
         clear wt coi power wt_r1i wt_imag wt_real
 
@@ -183,7 +194,7 @@ for ii = 1:size(tArray,1)
         fwrite(fid,fq(:,:),'int16'); % Remember the data type to open it.
         fclose(fid);  
        
-        clear wt coi power wt_r1i wt_imag wt_real
+        clear wt coi power wt_imag wt_real
         
     elseif ii == length(tArray)
         int = [tArray(ii,1) tf]; 
@@ -220,11 +231,17 @@ for ii = 1:size(tArray,1)
         
         fid = fopen(f,'a+');    
         fwrite(fid,fq(:,:),'int16'); % Remember the data type to open it.
-        fclose(fid);  
+        fclose(fid);
         
-        clear wt coi power wt_r1i wt_imag wt_real
+        clear wt coi power wt_imag wt_real
 
     end
+end
+
+if nargout > 0
+    wdata = wt_r1i;
+    wfreq = fq(:,:);
+else
 end
 
 end
@@ -233,7 +250,7 @@ end
 % % Fist open the freq.dat to know number of rows;
 % Data = 'mT1_300_600'; % Where 300 and 600 is the time
 % time = [300 600];
-%
+% 
 % file = dir(strcat(Data, '_freq.dat'));
 % fid = fopen(file.name, 'r');
 % freq = fread(fid, 'int16'); 
