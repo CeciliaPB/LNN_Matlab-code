@@ -43,12 +43,15 @@ function [wdata, wfreq] = wavelet_analysis(signal,time,tsegment,freq,varargin)
 % the analysis.
 % 
 % -------------------------------------------------------------------------
-% Cecília Pardo-Bellver, 2019
+% CecÃ­lia Pardo-Bellver, 2019
 % Laboratory of Network Neurophysiology
 % Instinute of Experimantal Medicine, Hungary.
 %
 % Wavelet software was provided by C. Torrence and G. Compo. See wavelet
 % function for more details.
+%
+% MATLAB toolboxes: Signal Processing Toolbox, Statistics and Machine
+% Learning Toolbox.
 % -------------------------------------------------------------------------
 
 % Optional input variables ------------------------------------------------
