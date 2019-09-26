@@ -24,9 +24,9 @@ function [FFT, fq] = fourier_analysis(signal, freq, varargin)
 %   fourier_analysis(signal,[0.5 300]);
 % 
 % -------------------------------------------------------------------------
-% CecÃ­lia Pardo-Bellver, 2019
+% Cecília Pardo-Bellver, 2019
 % Laboratory of Network Neurophysiology
-% Instinute of Experimantal Medicine, Hungary.
+% Institute of Experimantal Medicine, Hungary.
 %
 % Multi-taper script was provided by Chronux see website
 % http://chronux.org/ for more information.
