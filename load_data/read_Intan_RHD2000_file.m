@@ -1,4 +1,4 @@
-function read_Intan_RHD2000_file(file,path)
+function read_Intan_RHD2000_file(varargin)
 
 % read_Intan_RHD2000_file
 % 
@@ -16,16 +16,38 @@ function read_Intan_RHD2000_file(file,path)
 % >> whos
 % >> amplifier_channels(1)
 % >> plot(t_amplifier, amplifier_data(1,:))
+% 
+% -------------------------------------------------------------------------
+% Modified by Cecília Pardo-Bellver, 2019
+% Laboratory of Network Neurophysiology
+% Instinute of Experimantal Medicine, Hungary.
+%
+% Includes a varargin, so you can:
+% 
+% OPTION A: tell the file and path of the file to analyse 
+%   read_Intan_RHD2000_file(file, path)
+%
+% OPTION B: pop up window to select the file
+%   read_Intan_RHD2000_file
+% -------------------------------------------------------------------------
 
-% % Uncomment to pop up window to select the file
-% [file, path, filterindex] = ...
-%     uigetfile('*.rhd', 'Select an RHD2000 Data File', 'MultiSelect', 'off');
-% 
-% if (file == 0)
-%     return;
-% end
-% 
-% clearvars -except file path
+if ~isempty(varargin)
+    for ii = 1:length(varargin)
+        if max(strncmpi(fliplr(varargin{ii}), 'dhr.',4)) == 1 % Check for .rhd file
+            file = varargin{ii};
+        elseif max(strncmpi(fliplr(varargin{ii}), 'dhr.',4)) ~= 1
+            path = varargin{ii};
+        else
+        end
+    end
+elseif isempty(varargin) 
+    [file, path, filterindex] = ...
+    uigetfile('*.rhd', 'Select an RHD2000 Data File', 'MultiSelect', 'off');
+    if (file == 0)
+        return;
+    end
+    clearvars -except file path
+end
 
 tic;
 filename = fullfile(path,file);
@@ -332,7 +354,7 @@ if (data_present)
 
     print_increment = 10;
     percent_done = print_increment;
-    for i=1:num_data_blocks
+    for ii=1:num_data_blocks
         % In version 1.2, we moved from saving timestamps as unsigned
         % integeters to signed integers to accomidate negative (adjusted)
         % timestamps for pretrigger data.
@@ -371,7 +393,7 @@ if (data_present)
         board_dig_in_index = board_dig_in_index + num_samples_per_data_block;
         board_dig_out_index = board_dig_out_index + num_samples_per_data_block;
 
-        fraction_done = 100 * (i / num_data_blocks);
+        fraction_done = 100 * (ii / num_data_blocks);
         if (fraction_done >= percent_done)
             fprintf(1, '%d%% done...\n', percent_done);
             percent_done = percent_done + print_increment;
@@ -394,13 +416,13 @@ if (data_present)
     fprintf(1, 'Parsing data...\n');
 
     % Extract digital input channels to separate variables.
-    for i=1:num_board_dig_in_channels
-       mask = 2^(board_dig_in_channels(i).native_order) * ones(size(board_dig_in_raw));
-       board_dig_in_data(i, :) = (bitand(board_dig_in_raw, mask) > 0);
+    for ii=1:num_board_dig_in_channels
+       mask = 2^(board_dig_in_channels(ii).native_order) * ones(size(board_dig_in_raw));
+       board_dig_in_data(ii, :) = (bitand(board_dig_in_raw, mask) > 0);
     end
-    for i=1:num_board_dig_out_channels
-       mask = 2^(board_dig_out_channels(i).native_order) * ones(size(board_dig_out_raw));
-       board_dig_out_data(i, :) = (bitand(board_dig_out_raw, mask) > 0);
+    for ii=1:num_board_dig_out_channels
+       mask = 2^(board_dig_out_channels(ii).native_order) * ones(size(board_dig_out_raw));
+       board_dig_out_data(ii, :) = (bitand(board_dig_out_raw, mask) > 0);
     end
 
     % Scale voltage levels appropriately.
@@ -440,11 +462,11 @@ if (data_present)
 
         print_increment = 10;
         percent_done = print_increment;
-        for i=1:num_amplifier_channels
-            amplifier_data(i,:) = ...
-                notch_filter(amplifier_data(i,:), sample_rate, notch_filter_frequency, 10);
+        for ii=1:num_amplifier_channels
+            amplifier_data(ii,:) = ...
+                notch_filter(amplifier_data(ii,:), sample_rate, notch_filter_frequency, 10);
 
-            fraction_done = 100 * (i / num_amplifier_channels);
+            fraction_done = 100 * (ii / num_amplifier_channels);
             if (fraction_done >= percent_done)
                 fprintf(1, '%d%% done...\n', percent_done);
                 percent_done = percent_done + print_increment;
