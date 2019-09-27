@@ -22,7 +22,7 @@ function read_openephys_probe(varargin)
 %   Laboratory of Systems Neuroscience
 %   Institute of Experimental Medicine, Budapest, Hungary
 
-%   Cecília Pardo-Bellver, 2019
+%   CecÃ­lia Pardo-Bellver, 2019
 
 % Default arguments
 prs = inputParser;
