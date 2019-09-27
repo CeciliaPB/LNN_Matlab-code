@@ -9,8 +9,8 @@ function common_avg = common_avg_ref_probe(filepath,varargin)
 %
 %   See also LOAD_OPEN_EPHYS_DATA.
 
-% Panna Hegedüs, Balazs Hangya 2017/09
-% Cecília Pardo-Bellver, 2019
+% Panna HegedÃ¼s, Balazs Hangya 2017/09
+% CecÃ­lia Pardo-Bellver, 2019
 
 % Default arguments
 prs = inputParser;
