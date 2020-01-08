@@ -142,28 +142,30 @@ if chart==1
   
   [psth_spx, psth_t] = psth_hist(psth, bins);
   psth_t = psth_t + 0.5*bins;
-  bar((psth_t/fs),psth_spx);
+  bar((psth_t/fs),psth_spx,'EdgeColor',[0 0.4470 0.7410]);
   h= get(gca,'ylim');
   axis([min(psth_1st(:,1)/fs) max(psth_1st(:,1)/fs) 0 h(2)+1]);
   hold on; 
   h= get(gca,'ylim');
-  plot([0 0],[h(1) h(2)],'b');  
+  plot([0 0],[h(1) h(2)],'r','LineWidth',1);  
   hold off;
   ylabel('Spikes count');
   xlabel('Peri-stimulus time (s)');
 
+  set(gca,'fontname','arial');
+  
 elseif chart==2
   figure('name','Peri-stimulus time histogram','units','normalized','position',[0.3 0.3 0.4 0.3])
   
   subplot(223)
   [psth_spx, psth_t] = psth_hist(psth, bins);
   psth_t = psth_t + 0.5*bins;
-  bar((psth_t/fs),psth_spx);
+  bar((psth_t/fs),psth_spx,'EdgeColor',[0 0.4470 0.7410]);
   h= get(gca,'ylim');
   axis([min(psth(:,1)/fs) max(psth(:,1)/fs) 0 h(2)+1]);
   hold on; 
   h= get(gca,'ylim');
-  plot([0 0],[h(1) h(2)],'b');  
+  plot([0 0],[h(1) h(2)],'r','LineWidth',1);  
   hold off;
   ylabel('Spikes count');
   xlabel('Peri-stimulus time (s)');
@@ -177,11 +179,11 @@ elseif chart==2
     end
     
   for ii = 1:numel(ts)
-    plot(timevec/fs,rastmat(ii,:)*ii,'Color','k','Marker','.','MarkerSize',2,'LineStyle','none');
+    plot(timevec/fs,rastmat(ii,:)*ii,'Color','k','Marker','.','MarkerSize',4,'LineStyle','none');
     hold on;
   end
   hold on; h= get(gca,'ylim');
-  plot([0 0],[h(1) numel(ts)+0.5],'b');  hold off;
+  plot([0 0],[h(1) numel(ts)+0.5],'r','LineWidth',1);  hold off;
   axis([min(timevec/fs) max(timevec/fs) 0.5 numel(ts)+0.5]);
   ylabel('Trials');
   
@@ -194,25 +196,28 @@ elseif chart==2
     end
     
   for ii = 1:numel(ts_1st)
-    plot(timevec/fs,rastmat(ii,:)*ii,'Color','k','Marker','.','MarkerSize',2,'LineStyle','none');
+    plot(timevec/fs,rastmat(ii,:)*ii,'Color','k','Marker','.','MarkerSize',4,'LineStyle','none');
     hold on;
   end
   hold on; h= get(gca,'ylim'); 
-  plot([0 0],[h(1) numel(ts_1st)]+0.5,'b');  hold off;
+  plot([0 0],[h(1) numel(ts_1st)]+0.5,'r','LineWidth',1);  hold off;
   axis([min(timevec/fs) max(timevec/fs) 0.5 numel(ts_1st)+0.5]);
   ylabel('Trials');
   
   subplot(224)
   [psth_spx, psth_t] = psth_hist(psth_1st, bins);
   psth_t = psth_t + 0.5*bins;
-  bar((psth_t/fs),psth_spx);
+  bar((psth_t/fs),psth_spx,'EdgeColor',[0 0.4470 0.7410]);
   h= get(gca,'ylim');
   axis([min(psth_1st(:,1)/fs) max(psth_1st(:,1)/fs) 0 h(2)+1]);
   hold on; 
   h= get(gca,'ylim');
-  plot([0 0],[h(1) h(2)],'b');  
+  plot([0 0],[h(1) h(2)],'r','LineWidth',1);  
   hold off;
   ylabel('Spikes count');
   xlabel('Peri-stimulus time (s)');
   
+  set(gca,'fontname','arial');
+end
+
 end
