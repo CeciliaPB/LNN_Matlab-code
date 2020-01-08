@@ -18,8 +18,7 @@ function wf = waveform_analysis(group,neuron,varargin)
 % OUTPUTS: 
 %   - wf: a structure with the calculated features. For more information
 %   about these features click to see <a href="matlab:A =
-%   imread('L:\Cecilia\WFparams.tif'); imshow(A);">the Features Calculated
-%   image</a>. 
+%   imread('L:\Cecilia\WFparams.tif'); imshow(A);">Features image</a>. 
 %   - without output arguments, the function plots the mean waveform
 % 
 % Examples: 
@@ -40,11 +39,11 @@ s = 0;
 
 % Params, read from varargin
 if nargin
-  for i=1:size(varargin,2)
-    switch varargin{i}
+  for ii=1:size(varargin,2)
+    switch varargin{ii}
       case 's'
         s = 1;
-        type = varargin{i+1};
+        type = varargin{ii+1};
       otherwise  
     end
   end
