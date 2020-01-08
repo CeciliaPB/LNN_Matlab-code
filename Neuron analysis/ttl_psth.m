@@ -1,11 +1,11 @@
-function [psth, psth_1st, trialspx, trialspx2] = ttl_psth(spxtimes,trigtimes,bins,varargin)
+function [psth, ts, psth_1st, ts_1st] = ttl_psth(spktimes,trigtimes,bins,varargin)
 
 % Generates a peri-stimulus time histogram (psth) and returns the psth and
 % the spike timestamps relative to trigger times. IMPORTANT: all timestamp
-% inputs (spxtimes, trigtimes) must be in the same units, ideally secinds.
+% inputs (spktimes, trigtimes) must be in the same units, ideally secinds.
 %
 % INPUTS 
-% - spxtimes: vector with timestamps of spike events (units as recorded)
+% - spktimes: vector with timestamps of spike events (units as recorded)
 % - trigtimes: vector with timestamps of trigger events (units as recorded)
 % - bins: resolution of the histogram. 
 % Varargin 
@@ -20,13 +20,13 @@ function [psth, psth_1st, trialspx, trialspx2] = ttl_psth(spxtimes,trigtimes,bin
 % OUTPUT
 % - psth: peri-stimulus time histogram
 % - psth_1st: peri-stimulus time histogram up to the first after the trigger
-% - trialspx: spike timestamps relative to trigger times
-% - trialspx2: spike timestamps up to the first after the trigger 
+% - ts: spike timestamps relative to trigger times
+% - ts_1st: spike timestamps up to the first after the trigger 
 %
 % Examples 
-% psth = ttl_psth(timestamps, ttl, 1000);
-% [psth, ~, trialspx, ~] =  ttl_psth(timestamps, ttl, 1000,'pre',3000,...
-%       'post',3000,'chart',2);
+% [psth, ts] = ttl_psth(timestamps, ttl, 1000);
+% [psth, ts, psth_1st, ts_1st] =  ttl_psth(timestamps, ttl, 1000,'pre',0.5,...
+%       'post',0.5,'chart',2);
 %
 % -------------------------------------------------------------------------
 % Cecília Pardo-Bellver, 2019
@@ -87,20 +87,20 @@ elseif binsz==1
 end
 
 % construct psth & trialspx
-trialspx = cell(numel(trigtimes),1);
+ts = cell(numel(trigtimes),1);
 for ii = 1:numel(trigtimes)
   clear spikes
-  spikes = spxtimes - trigtimes(ii); % all spikes relative to current trigtime
-  trialspx{ii} = round(spikes(spikes>=-pre & spikes<=post)); % spikes close to current trigtime
+  spikes = spktimes - trigtimes(ii); % all spikes relative to current trigtime
+  ts{ii} = round(spikes(spikes>=-pre & spikes<=post)); % spikes close to current trigtime
   if binsz==1 % just to make sure...
-    psth(trialspx{ii}+pre+1,2) = psth(trialspx{ii}+pre+1,2)+1; % markers just add up
+    psth(ts{ii}+pre+1,2) = psth(ts{ii}+pre+1,2)+1; % markers just add up
     % previous line works fine as long as not more than one spike occurs in the same ms bin
     % in the same trial - else it's omitted
   elseif binsz>1
     try
-      for j = 1:numel(trialspx{ii})
-        psth(floor(trialspx{ii}(j)/binsz+pre/binsz+1),2) = ...
-            psth(floor(trialspx{ii}(j)/binsz+pre/binsz+1),2)+1;
+      for j = 1:numel(ts{ii})
+        psth(floor(ts{ii}(j)/binsz+pre/binsz+1),2) = ...
+            psth(floor(ts{ii}(j)/binsz+pre/binsz+1),2)+1;
       end
     catch
     end
@@ -108,10 +108,10 @@ for ii = 1:numel(trigtimes)
 end
 
 % construct psth & trialspx up to the first spike after the trigger
-trialspx2 = cell(numel(trigtimes),1);
+ts_1st = cell(numel(trigtimes),1);
 for ii = 1:numel(trigtimes)
   clear spikes
-  spikes = spxtimes - trigtimes(ii); % all spikes relative to current trigtime
+  spikes = spktimes - trigtimes(ii); % all spikes relative to current trigtime
   st = find(spikes>0,1);
   st = (spikes(st));
     if isempty(st)
@@ -121,14 +121,14 @@ for ii = 1:numel(trigtimes)
   SPpost = spikes<=post;
   SPst = spikes<=st;
   SP = SPpost & SPst;
-  trialspx2{ii} = round(spikes(SPpre & SP)); % spikes close to trigtime up to 1st after trigger
+  ts_1st{ii} = round(spikes(SPpre & SP)); % spikes close to trigtime up to 1st after trigger
   if binsz==1 % just to make sure...
-     psth_1st(trialspx2{ii}+pre+1,2) = psth_1st(trialspx2{ii}+pre+1,2)+1;  
+     psth_1st(ts_1st{ii}+pre+1,2) = psth_1st(ts_1st{ii}+pre+1,2)+1;  
   elseif binsz>1
     try
-      for j = 1:numel(trialspx{ii})
-        psth_1st(floor(trialspx{ii}(j)/binsz+pre/binsz+1),2) = ...
-            psth_1st(floor(trialspx{ii}(j)/binsz+pre/binsz+1),2)+1;
+      for j = 1:numel(ts{ii})
+        psth_1st(floor(ts{ii}(j)/binsz+pre/binsz+1),2) = ...
+            psth_1st(floor(ts{ii}(j)/binsz+pre/binsz+1),2)+1;
       end
     catch
     end
@@ -169,37 +169,37 @@ elseif chart==2
   xlabel('Peri-stimulus time (s)');
   
   subplot(221)
-  rastmat = zeros(numel(trialspx),pre+1+post);
+  rastmat = zeros(numel(ts),pre+1+post);
   timevec = -pre:1:post;  
   % generate raster
-    for ii = 1:numel(trialspx)
-        rastmat(ii,trialspx{ii}+pre+1) = 1;
+    for ii = 1:numel(ts)
+        rastmat(ii,ts{ii}+pre+1) = 1;
     end
     
-  for ii = 1:numel(trialspx)
+  for ii = 1:numel(ts)
     plot(timevec/fs,rastmat(ii,:)*ii,'Color','k','Marker','.','MarkerSize',2,'LineStyle','none');
     hold on;
   end
   hold on; h= get(gca,'ylim');
-  plot([0 0],[h(1) numel(trialspx)+0.5],'b');  hold off;
-  axis([min(timevec/fs) max(timevec/fs) 0.5 numel(trialspx)+0.5]);
+  plot([0 0],[h(1) numel(ts)+0.5],'b');  hold off;
+  axis([min(timevec/fs) max(timevec/fs) 0.5 numel(ts)+0.5]);
   ylabel('Trials');
   
   subplot(222)
-  rastmat = zeros(numel(trialspx2),pre+1+post);
+  rastmat = zeros(numel(ts_1st),pre+1+post);
   timevec = -pre:1:post;  
   % generate raster
-    for ii = 1:numel(trialspx2)
-        rastmat(ii,trialspx2{ii}+pre+1) = 1;
+    for ii = 1:numel(ts_1st)
+        rastmat(ii,ts_1st{ii}+pre+1) = 1;
     end
     
-  for ii = 1:numel(trialspx2)
+  for ii = 1:numel(ts_1st)
     plot(timevec/fs,rastmat(ii,:)*ii,'Color','k','Marker','.','MarkerSize',2,'LineStyle','none');
     hold on;
   end
   hold on; h= get(gca,'ylim'); 
-  plot([0 0],[h(1) numel(trialspx2)]+0.5,'b');  hold off;
-  axis([min(timevec/fs) max(timevec/fs) 0.5 numel(trialspx2)+0.5]);
+  plot([0 0],[h(1) numel(ts_1st)]+0.5,'b');  hold off;
+  axis([min(timevec/fs) max(timevec/fs) 0.5 numel(ts_1st)+0.5]);
   ylabel('Trials');
   
   subplot(224)

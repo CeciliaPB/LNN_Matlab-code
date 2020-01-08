@@ -1,10 +1,13 @@
-function psth = allneurons_psth(group, ttl, varargin)
+function psth = allneurons_psth(ngroup, ttl, varargin)
 
 % Get data from psth and save to mat for each neuron
+% IMPORTANT: For the analysis of pairs use ttl_psth.
 % 
 % INPUTS: 
-%   - group:
-%   - ttl:
+%   - ngroup: groups of neurons to perform the analysis. It can be a single
+%   group (ngroup = 2, for GR2) or several (ngroup = [1:8], for GR1 to
+%   GR8). 
+%   - ttl: a vector containing the ttl timestamps.
 % Varargin
 %   - 'fs': sampling rate. Dafault 30000.
 %   - 'Dt': Delay time, between the recording and the ttl. Ex. in case of
@@ -17,18 +20,19 @@ function psth = allneurons_psth(group, ttl, varargin)
 %   - 's': to save the images. Default NOT save figs
 % 
 % OUTPUTS: 
-%   - psth:
+%   - psth: a structure with the spikes around the event (all and up to
+%   1st), and the mean values for the firing times of the neuron.
 %   
 % Examples: 
-% psth = allneurons_psth(group, ttl);
-% psth = allneurons_psth(group, ttl, 'pre',0.5,'post',0.5,'fr',30000);
+% psth = allneurons_psth([1:8], ttl);
+% psth = allneurons_psth(2, ttl, 'pre',0.5,'post',0.5,'fr',30000);
 % 
 % -------------------------------------------------------------------------
 % Cecília Pardo-Bellver, 2020
 % Laboratory of Network Neurophysiology
 % Instinute of Experimantal Medicine, Hungary.
 %
-% MATLAB toolboxes: 
+% MATLAB toolboxes: - 
 % -------------------------------------------------------------------------
   
 % Default params
@@ -69,7 +73,8 @@ if nargin
     end
 end
 
-tmp = dir([group(1:end-4),'_','*.mat']); % all .mat that belong to the group
+for nn = ngroup
+tmp = dir(['*',num2str(nn),'_','*.mat']); % all .mat that belong to the group
 files = {tmp.name}'; 
 
 % This reorders the files so after 1 comes 2 and not 10. Thank you MATLAB.
@@ -106,11 +111,14 @@ for ii = 1:length(files)
     if exist('Dt', 'var') == 0
         TT = ((TS(:,1)/10000)); 
     elseif exist('Dt', 'var') == 1
+        A = dir('*.continuous');
+        B = char({A.name});
+        [~, ts, ~] = load_open_ephys_data(B(1,:));
         TT = ((TS(:,1)/10000)-(min(ts)+Dt)/60);
     end
     
     % Calculate spike time around ttl
-    [psth1,psth2,ts1,ts2] = ttl_psth(TT*fs, ttl*fs, bin, 'fs', fs, 'pre',...
+    [psth1,ts1,~,ts2] = ttl_psth(TT*fs, ttl*fs, bin, 'fs', fs, 'pre',...
         pre, 'post', post, 'chart', 2);
    
     % All spikes before & after ttl            
@@ -162,17 +170,17 @@ for ii = 1:length(files)
     save(neuron,name,'-append');
     
     if s == 1
-        saveas(gcf, matlab.lang.makeValidName([group(1:end-4),'_',...
-            num2str(ii),'_', num2str(floor(sec)),'s']), 'jpg')
-%         saveas(gcf, genvarname([group(1:end-4),'_',num2str(ii),'_',...
-%             num2str(floor(sec)),'s']), 'svg')
+        saveas(gcf, matlab.lang.makeValidName([neuron(1:end-4),...
+            '_', num2str(floor(post/fs)),'s']), 'jpg')
+%         saveas(gcf, matlab.lang.makeValidName([group(1:end-4),'_',...
+%             num2str(ii),'_',num2str(floor(post/fs)),'s']), 'svg')
     else
     end
     
-    Gr_N{ii,:} = [group(1:end-4),'_',num2str(ii)];
+    Gr_N{ii,:} = neuron(1:end-4);
     xls(ii,1:4) = FstSpk_means;
     clearvars -except GR Dt ttl files fs pre post bin ts TTL...
-        name sound excel sec Gr_N
+        name sound excel sec Gr_N s excel group psth
 %     close gcf;
 end
 
@@ -186,8 +194,10 @@ if excel == 1
     T.Std = xls(:,3);
     T.numSpk = xls(:,4);
 
-    writetable(T, [group(1:end-4),'.xls']);
+    writetable(T, [neuron(1:end-6),'.xls']);
 else
+end
+
 end
 
 end

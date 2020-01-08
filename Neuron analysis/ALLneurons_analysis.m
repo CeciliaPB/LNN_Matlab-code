@@ -1,13 +1,14 @@
-function ALLneurons_analysis(n, varargin)
+function ALLneurons_analysis(ngroup, varargin)
 
 % This function calculates several data from each neuron: features of the
 % waveforms, plots the waveforms, ISI histogram, Cross correlation and
 % Autocorrelation. In the VARARGIN you can choose which things to
 % calculate, the default mode calculates everything.
+% IMPORTANT: For the analysis of pairs use neuron_analysis.
 % 
 % INPUTS: 
 %   - n: number of groups to analyse. ex. 8, will calculate from GR1 to
-%   GR8. For the analysis of pairs use neuron_analysis. 
+%   GR8.  
 %   Varargin
 %   - 'plot': when you want to plot the waveform. The default plot is the
 %   mean waveform. You can choose to plot only the mean waveform ('mean') or
@@ -38,34 +39,36 @@ function ALLneurons_analysis(n, varargin)
 % MATLAB toolboxes: Signal Processing Toolbox.
 % -------------------------------------------------------------------------
 
-% Default params
+% Default calculations
 ToCalculate = {'wf', 'plot', 'mean', 'ISI', 'XCorr', 'ACorr', 's'};
 
+% Calculations defined in varargin
 if ~isempty(varargin)
     ToCalculate = varargin;
 else
 end
 
 s = 0;
-if max(strcmp(varargin, 's')) == 1 % Save the plots
+if max(strcmp(ToCalculate, 's')) == 1 % Save the plots
     s = 1;
-elseif max(strcmp(varargin, 's')) ~= 1 % Not save the plots
+elseif max(strcmp(ToCalculate, 's')) ~= 1 % Not save the plots
     s = 0;
 end
 
-for xx = 1:n
+for xx = 1:ngroup
 GR = xx; % Group of tetrodes to analyse
 
-A = dir(['*',num2str(GR),'.mat']);
-k =(max(cell2mat({A.bytes})));
+A = dir(['*',num2str(GR),'.mat']); 
+k =(max(cell2mat({A.bytes}))); % Select the largest (will have TimeStamps and WaveForms) 
 B = find(cell2mat({A.bytes}) == k);
 C = {A.name};
 D = C(B); %#ok<FNDSB>
 group = D{1};
-load(group,'TimeStamps','WaveForms'); % Load 
-tmp = dir(['*',num2str(GR),'_','*.mat']); % all .mat of the group
+load(group,'TimeStamps','WaveForms'); 
+tmp = dir(['*',num2str(GR),'_','*.mat']); % all neurons of the group
 files = {tmp.name}'; 
 
+% This reorders the files so after 1 comes 2 and not 10. Thank you MATLAB.
 if length(files)>9
     A = length(files)-9;
     for ll = 1:A
@@ -87,7 +90,6 @@ for nn = 1:length(files)
     TS = load(neuron,'TS');
     TS = TS.TS;
 
-% Params, read from varargin
 for ii = 1:size(ToCalculate,2)
     switch ToCalculate{ii}
       case 'wf' % Waveform calculations -----------------------------------
@@ -100,6 +102,7 @@ for ii = 1:size(ToCalculate,2)
             waveform_analysis(group,neuron,'plot','all');
         end
         
+        % Extract the waveforms corresponding to the TS (neuron)
         A = TS/10000;
         C = zeros(length(TimeStamps),1);
 
@@ -114,7 +117,8 @@ for ii = 1:size(ToCalculate,2)
             F = mean(E(:,:));
             F2(jj,:) = F; 
             end
-
+            
+        % From the 4 possible wf selects the one with highest amplitude
         H = [min(F2,[],2),max(F2,[],2)];
         H2 = H(:,2)-H(:,1);
         H3 = max(H2);
@@ -166,7 +170,7 @@ for ii = 1:size(ToCalculate,2)
     end
 end
 
-% Generate variables to output and save 
+% Save the generated variables  
 for ii = 1:size(ToCalculate,2)
     switch ToCalculate{ii}
         case 'wf' % Save waveform calculations ----------------------------
