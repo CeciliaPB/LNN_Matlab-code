@@ -5,7 +5,7 @@ function [HISTvals,X] = ACorrelogram(n1, varargin)
 % INPUT: 
 %   - n1: .mat file with thw timestamps of the neuron. ex. 'GR1_1.mat'
 %   Varargin
-%   - 'bin': bin size of choice in msec. Default 1.
+%   - 'bins': bin size of choice in msec. Default 1.
 %   - 'width': msec on each side of the xcorr plot. Default 250.
 %   - 's': saves the figure in the specified file format (jpg, png,
 %   svg, etc.). See saveas help for more info. Default NOT save.
@@ -57,11 +57,12 @@ if isempty(TS1)
     msgbox('No spikes in the chosen clusters.')
 else
     [histvals,x] = AutoCorr(TS1, bin, width);
-    bar(x,histvals)
+    bar(x,histvals,'LineStyle','none')
     xlabel('msec')
     xlabel(['msec (' num2str(bin) 'msec binsize)']);
     ylabel('rate');
     title('Autocorrelation');
+    set(gca,'fontname','arial');
     
 if nargout > 0
     HISTvals = histvals;

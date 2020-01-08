@@ -6,7 +6,7 @@ function [Y,X] = XCorrelogram(n1, n2, varargin)
 %   - n1: .mat file with thw timestamps of neuron 1. ex. 'GR1_1.mat'
 %   - n2: .mat file with thw timestamps of neuron 2. ex. 'GR1_2.mat'
 %   Varargin
-%   - 'bin': bin size of choice in msec. Default 1.
+%   - 'bins': bin size of choice in msec. Default 1.
 %   - 'width': msec on each side of the xcorr plot. Default 250.
 %   - 's': saves the figure in the specified file format (jpg, png,
 %   svg, etc.). See saveas help for more info. Default NOT save.
@@ -60,10 +60,11 @@ if isempty(TS1) || isempty(TS2)
     msgbox('No spikes in one of the chosen clusters.')
 else
     [y, x] = CrossCorr(TS1, TS2, bin, nbins);
-    bar(x,y)
+    bar(x,y,'LineStyle','none')
     xlabel('msec')
     ylabel('Count')
     title('XCorr');
+    set(gca,'fontname','arial');
 end
 
 if nargout > 0

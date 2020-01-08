@@ -38,7 +38,7 @@ function neuron_analysis(neuron, varargin)
 % -------------------------------------------------------------------------
 
 % Default params
-ToCalculate = {'wf', 'plot', 'mean', 'ISI', 'XCorr', 'ACorr', 's'};
+ToCalculate = {'wf', 'plot', 'mean', 'ISI', 'XCorr', 'ACorr'};
 
 if ~isempty(varargin)
     ToCalculate = varargin;
@@ -46,9 +46,9 @@ else
 end
 
 s = 0;
-if max(strcmp(varargin, 's')) == 1 % Save the plots
+if max(strcmp(ToCalculate, 's')) == 1 % Save the plots
     s = 1;
-elseif max(strcmp(varargin, 's')) ~= 1 % Not save the plots
+elseif max(strcmp(ToCalculate, 's')) ~= 1 % Not save the plots
     s = 0;
 end
 
@@ -63,12 +63,13 @@ for ii = 1:size(ToCalculate,2)
         wf = waveform_analysis(group,neuron,'features');
                 
       case 'plot' % Plot waveforms ----------------------------------------
-        if max(strcmp(varargin, 'mean')) == 1 % Plot mean waveform
+        if max(strcmp(ToCalculate, 'mean')) == 1 % Plot mean waveform
             waveform_analysis(group,neuron,'plot','mean');
-        elseif max(strcmp(varargin, 'all')) == 1 % Plot all waveforms
+        elseif max(strcmp(ToCalculate, 'all')) == 1 % Plot all waveforms
             waveform_analysis(group,neuron,'plot','all');
         end
         
+        % Extract the waveforms corresponding to the TS (neuron)
         A = TS/10000;
         C = zeros(length(TimeStamps),1);
 
@@ -83,7 +84,8 @@ for ii = 1:size(ToCalculate,2)
             F = mean(E(:,:));
             F2(jj,:) = F; 
             end
-
+          
+        % From the 4 possible wf selects the one with highest amplitude
         H = [min(F2,[],2),max(F2,[],2)];
         H2 = H(:,2)-H(:,1);
         H3 = max(H2);
@@ -107,9 +109,9 @@ for ii = 1:size(ToCalculate,2)
             '_ISIhist']), 'jpg');
         elseif s ~= 1
         end
-        
+       
       case 'XCorr' % XCorrelogram -----------------------------------------
-        [XCorrVals,XCorrX] = XCorrelogram(neuron, neuron);
+        [XCorrVals,XCorrX] = XCorrelogram(neuron, neuron, 'bins', 2);
         
         if s == 1
 %         saveas(gcf, genvarname(['TT',num2str(GR),'_',num2str(nr),...
@@ -118,7 +120,7 @@ for ii = 1:size(ToCalculate,2)
             '_XCorr']), 'jpg');
         elseif s ~= 1
         end 
-        
+      
       case 'ACorr' % ACorrelogram -----------------------------------------
         [ACorrVals,ACorrX] = ACorrelogram(neuron);
         
@@ -135,7 +137,7 @@ for ii = 1:size(ToCalculate,2)
     end
 end
 
-% Generate variables to output and save 
+% Save the generated variables  
 for ii = 1:size(ToCalculate,2)
     switch ToCalculate{ii}
         case 'wf' % Save waveform calculations ----------------------------

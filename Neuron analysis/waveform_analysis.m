@@ -90,6 +90,12 @@ mDOWN = -mUP; % Inverted values
 if logical(max(strcmp(varargin, 'features')) == 1) && logical(max(strcmp(varargin, 'plot')) == 1)
     if max(strcmp(varargin, 'mean')) == 1 % Plot mean waveform
         plot(mUP);
+        xticks([0 15 30]);
+        xticklabels([0 0.5 1]);
+        xlabel('msec')
+        ylabel('Amplitude')
+        title(['Waveform - Channel: ', num2str(find (G == 1))]);
+        set(gca,'fontname','arial');
     elseif max(strcmp(varargin, 'all')) == 1 % Plot all waveforms
         for kk = 1:length(E)
         plot(allUP(kk,:),'k');
@@ -98,6 +104,12 @@ if logical(max(strcmp(varargin, 'features')) == 1) && logical(max(strcmp(varargi
         hold on;
         plot(mUP,'r');
         hold off;
+        xticks([0 15 30]);
+        xticklabels([0 0.5 1]);
+        xlabel('msec')
+        ylabel('Amplitude')
+        title(['Waveform - Channel: ', num2str(find (G == 1))]);
+        set(gca,'fontname','arial');
     end
 
     % Calculate features using the mean waveform
@@ -140,6 +152,12 @@ if logical(max(strcmp(varargin, 'features')) == 1) && logical(max(strcmp(varargi
 elseif max(strcmp(varargin, 'plot')) == 1
     if max(strcmp(varargin, 'mean')) == 1 % Plot mean waveform
         plot(mUP);
+        xticks([0 15 30]);
+        xticklabels([0 0.5 1]);
+        xlabel('msec')
+        ylabel('Amplitude')
+        title(['Waveform - Channel: ', num2str(find (G == 1))]);
+        set(gca,'fontname','arial');
     elseif max(strcmp(varargin, 'all')) == 1 % Plot all waveforms
         for kk = 1:length(E)
         plot(allUP(kk,:),'k');
@@ -148,6 +166,12 @@ elseif max(strcmp(varargin, 'plot')) == 1
         hold on;
         plot(mUP,'r');
         hold off;
+        xticks([0 15 30]);
+        xticklabels([0 0.5 1]);
+        xlabel('msec')
+        ylabel('Amplitude')
+        title(['Waveform - Channel: ', num2str(find (G == 1))]);
+        set(gca,'fontname','arial');
     end
     
 elseif max(strcmp(varargin, 'features')) == 1
@@ -188,14 +212,19 @@ elseif max(strcmp(varargin, 'features')) == 1
         wf.i = I(1,2) - wf.pk2(1,2);
         wf.mWF = mUP;
         
-else % If there are no warargins plot mean waveform
+else % If there are no varargins plot mean waveform
     plot(mUP);
+    xticks([0 15 30]);
+    xticklabels([0 0.5 1]);
+    xlabel('msec')
+    ylabel('Amplitude')
+    title(['Waveform - Channel: ', num2str(find (G == 1))]);
+    set(gca,'fontname','arial');
 end
 
 if s == 1
     saveas(gcf, genvarname([neuron(1:end-4),'_',num2str(G),'_wave']), type);
 elseif s ~= 1
 end    
-
 
 end
