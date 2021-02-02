@@ -17,12 +17,12 @@ function read_openephys_probe(varargin)
 %           referencing
 %
 %   See also OEDISC.
-
+%
 %   Balazs Hangya
 %   Laboratory of Systems Neuroscience
 %   Institute of Experimental Medicine, Budapest, Hungary
-
-%   CecÃ­lia Pardo-Bellver, 2019
+%
+%   Cecília Pardo-Bellver, 2019
 
 % Default arguments
 prs = inputParser;
@@ -36,7 +36,7 @@ addParameter(prs,'reference','common_avg',@(s)ischar(s)|isempty(s))   % switch f
 parse(prs,varargin{:})
 g = prs.Results;
 
-Th = 30;  % Threshold for the spike detection
+Th = 35;  % Threshold for the spike detection
 
 % Tetrode organization of the channels
 if nargin < 3 || isempty(g.CHspec)
@@ -55,7 +55,7 @@ SaveFeatures = true;   % save MClust feature files
 % Common average reference
 switch g.reference
     case 'common_avg'
-        common_avg = common_avg_ref_probe(g.datadir,g.CHspec,[],g.rawdatafiletag);
+        common_avg = common_avg_ref_probe(g.datadir,g.CHspec,[],g.rawdatafiletag,'processor', g.processor);
     case {'','none'}
         common_avg = 0;
     otherwise
@@ -87,7 +87,7 @@ for iT = g.TTspec
     if SaveFeatures   % pre-calculate MClust features
         GRdata.TimeStamps = TimeStamps;
         GRdata.WaveForms = WaveForms;
-        openephys_SaveMClustFeatures(GRdata,{'Amplitude';'Energy';'WavePC1';'Time'},[1 1 1 1],GR_path);
+        openephys_SaveMClustFeatures(GRdata,{'Amplitude';'Energy';'WavePC1';'WavePC2';'Time'},[1 1 1 1],GR_path);
     end
     
     clearvars -except g common_avg filepath resdir SaveFeatures iT Th
@@ -115,14 +115,14 @@ for iT = 1:max(g.TTspec)-1
     [AllTimeStamps, AllWaveForms] = oedisc_probe(data,tss,info.header.sampleRate,Th,[]);   % filter and detect spikes
     TimeStamps = AllTimeStamps{1};
     WaveForms = AllWaveForms{1};
-    GRname = ['Pair' num2str(iT)];
+    GRname = ['PR' num2str(iT+8)];
     GR_path = fullfile(g.resdir,GRname);
     save(GR_path, 'TimeStamps','WaveForms');
     
     if SaveFeatures   % pre-calculate MClust features
         GRdata.TimeStamps = TimeStamps;
         GRdata.WaveForms = WaveForms;
-        openephys_SaveMClustFeatures(GRdata,{'Amplitude';'Energy';'WavePC1';'Time'},[1 1 0 0],GR_path);
+        openephys_SaveMClustFeatures(GRdata,{'Amplitude';'Energy';'WavePC1';'WavePC2';'Time'},[1 1 0 0],GR_path);
     end
     
     clearvars -except g common_avg filepath resdir SaveFeatures iT Th
