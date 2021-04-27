@@ -1,6 +1,6 @@
 function OEtoDat(varargin)
 
-% Convert OpenEphys .continuous files to .dat files
+% Convert OpenEphys .continuous files to .dat files, separate channels
 %
 % INPUTS: 
 %   Varargin: 
@@ -11,7 +11,7 @@ function OEtoDat(varargin)
 % OEtoDat('processor',101);
 %
 % -------------------------------------------------------------------------
-% Modified by Cecília Pardo-Bellver, 2019
+% Cecília Pardo-Bellver, 2019
 % Laboratory of Network Neurophysiology
 % Institute of Experimantal Medicine, Hungary.
 % -------------------------------------------------------------------------
@@ -28,14 +28,14 @@ if nargin
 else
 end
 
-common_avg = common_avg_1ch(cd, 'processor',processor, 32);
+common_avg = common_avg_1ch(cd, 'processor',processor, 'channel_number', 32);
 
 for ii = 1:32
 [data, ts, ~] = load_open_ephys_data([cd '\' num2str(processor) '_CH' num2str(ii) '.continuous']);
 
 data = data - common_avg;
 
-name = ['CH',num2str(ii),'.dat'];
+name = ['CH',num2str(ii),'.dat']; 
 fid = fopen(name,'w+'); 
 fwrite(fid,data,'int16'); % Remember the data type to open it.
 fclose(fid);
