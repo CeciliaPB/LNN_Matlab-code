@@ -8,8 +8,14 @@ function common_avg = common_avg_ref(filepath,varargin)
 %   and any potential channels to exclude from averaging.
 %
 %   See also LOAD_OPEN_EPHYS_DATA.
+%
+%   Panna Hegedüs, Balazs Hangya 2017/09
+%
+%   Modified by Cecília Pardo-Bellver, 2021
+%   Laboratory of Network Neurophysiology
+%   Institute of Experimental Medicine, Hungary.
+% -------------------------------------------------------------------------
 
-% Panna Hegedüs, Balazs Hangya 2017/09
 
 % Default arguments
 prs = inputParser;

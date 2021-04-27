@@ -12,7 +12,7 @@ function common_avg = common_avg_ref_probe(filepath,varargin)
 % -------------------------------------------------------------------------
 % Modified by Cecília Pardo-Bellver, 2019
 % Laboratory of Network Neurophysiology
-% Institute of Experimantal Medicine, Hungary.
+% Institute of Experimental Medicine, Hungary.
 %
 % Based on COMMON_AVG_REF.m
 % By Panna Hegedüs, Balazs Hangya 2017/09

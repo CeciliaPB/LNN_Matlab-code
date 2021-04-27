@@ -1,3 +1,12 @@
+%   This script provides the steps to perform a fast analysis of the LFP, a
+%   brief explanation is included at the beggining of each step.
+%
+% -------------------------------------------------------------------------
+%   Cecília Pardo-Bellver, 2019 
+%   Laboratory of Network Neurophysiology 
+%   Institute of Experimental Medicine, Hungary.
+% -------------------------------------------------------------------------
+
 %% Convert .continuous to dat 
 % Important: In case of multiple .continuous for each channel. File name:
 % XXX_CHn, where XXX is the number of processor and c the number of

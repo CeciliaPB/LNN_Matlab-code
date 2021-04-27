@@ -44,6 +44,8 @@ if nargin < 3 || isempty(g.CHspec)
     NumTetrodes = g.CHspec / 4;
     g.TTspec = 1:NumTetrodes;
 end
+NumTetrodes = g.CHspec / 4;
+g.TTspec = 1:NumTetrodes;
 
 % Directories
 if isequal(g.datadir(end),'\')

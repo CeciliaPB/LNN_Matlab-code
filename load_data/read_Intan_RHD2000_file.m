@@ -20,7 +20,7 @@ function read_Intan_RHD2000_file(varargin)
 % -------------------------------------------------------------------------
 % Modified by Cecília Pardo-Bellver, 2019
 % Laboratory of Network Neurophysiology
-% Instinute of Experimantal Medicine, Hungary.
+% Instinute of Experimental Medicine, Hungary.
 %
 % Includes a varargin, so you can:
 % 

@@ -1,7 +1,5 @@
-function [FFT, fq] = fourier_analysis(signal, freq, varargin)
+function fourier_analysis(signal, freq, varargin)
 
-% Provides the spectrum density ( i.e. frequency) of the time-domain signal.
-%
 % INPUTS: 
 %   - signal: signal to analyse, a vector
 %   - freq: frequency range to analyse, an interval: [f1 f2]
@@ -12,31 +10,24 @@ function [FFT, fq] = fourier_analysis(signal, freq, varargin)
 %             Matlab's 'fft' with Butterworh filter 'Butter'. It can be
 %             changed to 'Multi-taper'.
 %
-% OUTPUTS: 
-%   - FFT: results of the fast fourier transform.
-%   - fq: the frequency vector.
-%   - The plot
-%   If no output vars are provided, then only the plot.
+% OUTPUTS: Just the plot.
 % 
 % Examples: 
-%   [FFT, fq] = fourier_analysis(signal,[0.5 300]);
 %   fourier_analysis(signal,[0.5 300],'mother','Multi-taper');
 %   fourier_analysis(signal,[0.5 300]);
 % 
 % -------------------------------------------------------------------------
-% Cecília Pardo-Bellver, 2019
+% Cecília Pardo-Bellver
 % Laboratory of Network Neurophysiology
-% Institute of Experimantal Medicine, Hungary.
+% Institute of Experimental Medicine, Hungary.
 %
 % Multi-taper script was provided by Chronux see website
 % http://chronux.org/ for more information.
-%
-% MATLAB toolboxes: Signal Processing Toolbox.
 % -------------------------------------------------------------------------
 
 % Optional input variables ------------------------------------------------
 % Params, defalut values:
-fr = 30000; 
+fr = 30000;
 n = 3;
 mother = 'Butter';
 
@@ -65,10 +56,10 @@ switch mother
         [b,a] = butter(2,wn); % 2nd order  
         ft = filter(b,a,signal2);
         N = length(ft); % Lower values truncate the signal vector.
-        f = linspace(0,fr/n,N);
+        fq = linspace(0,fr/n,N);
         F = fft(ft,N);
         figure; 
-        plot(f,smooth(abs(F),0.0001,'lowess')); % 0.0001
+        plot(fq,smooth(abs(F),0.0001,'lowess'));
         xlim([min(freq) max(freq)]);
 
     case 'Multi-taper' % Multi-taper fourier transform - continuous data 
@@ -100,11 +91,4 @@ switch mother
         plot(f,smooth(F,0.001,'lowess')); % Adjust smooth level (0.02)
         xlim([min(freq) max(freq)]);
 end
-
-if nargout > 0
-    FFT = F;
-    fq = f;
-else
-end
-
 end

@@ -11,10 +11,15 @@ function [AllTimeStamps, AllWaveForms] = oedisc_probe(data,ts,sr,thr,varargin)
 %   (DR). If DR is empty, the data is not saved.
 %
 %   See also READ_INTAN_DATA.
-
+%
 %   Balazs Hangya, Institute of Experimental Medicine
 %   hangya.balazs@koki.mta.hu
 %   30-Jan-2018
+%
+%   Modified by Cecília Pardo-Bellver, 2021
+%   Laboratory of Network Neurophysiology
+%   Institute of Experimental Medicine, Hungary.
+% -------------------------------------------------------------------------
 
 % Default arguments
 prs = inputParser;

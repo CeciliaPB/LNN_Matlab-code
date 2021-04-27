@@ -94,7 +94,7 @@ pn = 1/freq(2);
 s0 = pn/1.03; % the smallest scale of the wavelet.  Default is 2*DT.
 sn = p0/1.03;
 pad = 1;
-j1 = log2(sn/s0)/dj; %the # of scales minus one. Scales range from S0 up to S0*2^(J1*DJ),
+j1 = ceil(log2(sn/s0)/dj); %the # of scales minus one. Scales range from S0 up to S0*2^(J1*DJ),
 %        to give a total of (J1+1) scales. Default is J1 = (LOG2(N DT/S0))/DJ.
 
 %     % Wavelet params as set by Hanya B
@@ -161,7 +161,7 @@ for ii = 1:size(tArray,1)
         fwrite(fid,fq(:,:),'int16'); % Remember the data type to open it.
         fclose(fid);
     
-        clear wt coi power wt_r1i wt_imag wt_real
+        clear wt coi power wt_imag wt_real
 
     elseif ii < length(tArray)
         int = [tArray(ii,1) tArray(ii,2)]; 
