@@ -1,5 +1,20 @@
 function ops = convertOpenEphysToDat(filename,varargin)
 
+% Convert OpenEphys .continuous files to ONE .dat file
+%
+% INPUTS: 
+%   - filename: name of the file to save. STRING.
+%   Varargin: 
+%   - 'datadir': path name for reading data. Default current directory.
+%   - 'resdir': path name for writing result files. Default current
+%   directory.
+%   - 'nChan': Number of channels. Default 32.
+%   - 'processor': processor number. Default 101.
+% 
+% EXAMPLES
+% convertOpenEphysToDat('continuous')
+% convertOpenEphysToDat('continuous','nChan',64,'processor',100)
+%
 % -------------------------------------------------------------------------
 % Cecília Pardo-Bellver, 2021
 % Laboratory of Network Neurophysiology
@@ -14,7 +29,6 @@ addOptional(prs,'datadir',cd,@(s)isempty(s)|isdir(s))  % data directory
 addOptional(prs,'resdir','',@(s)isempty(s)|isdir(s))   % results directory
 addOptional(prs,'nChan',32,@isnumeric)   % Number of channels (default: 32 channels)
 addOptional(prs,'processor',101,@isnumeric) % Processor number, default 101
-addParameter(prs,'reference','common_avg',@(s)ischar(s)|isempty(s))   % switch for referencing
 parse(prs,varargin{:})
 ops = prs.Results;
 

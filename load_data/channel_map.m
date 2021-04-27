@@ -1,21 +1,17 @@
 function channel_map(CHfolder, processor, probe)
 
-% This function reads a file (.continuous from OpenEphys) or data+time
-% variables (.mat generated from an .rhd from Intan) or data+time in the
-% Workspace (loaded audio file) and detects values above a threshold as
-% timestamps for the TTL.  
+% This function reads .continuous files from OpenEphys, renames and saves
+% them in a new folder (CHfolder).
 % 
 % INPUTS: 
 %   - CHfolder: Name of the folder where the reordered channels will be
 %   saved. 
-%   - processor: . 
-%   - probe:
+%   - processor: processor number. Default 101.
+%   - probe: probe type, the script reorders the channel numbers according
+%   to it.
 %
-% OUTPUTS: 
-%   - .
-% 
 % Examples: 
-% 
+%   channel_map('ReorderCH','110','A32');
 % 
 % -------------------------------------------------------------------------
 % Cecília Pardo-Bellver, 2019

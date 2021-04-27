@@ -1,5 +1,22 @@
 function ops = convertOpenEphysToDat_CAR(filename,varargin)
 
+% Convert OpenEphys .continuous files to ONE .dat file. Default CAR.
+%
+% INPUTS: 
+%   - filename: name of the file to save. STRING.
+%   Varargin: 
+%   - 'datadir': path name for reading data. Default current directory.
+%   - 'resdir': path name for writing result files. Default current
+%   directory.
+%   - 'nChan': Number of channels. Default 32.
+%   - 'processor': processor number. Default 101.
+%   - 'CAR': common average reference of the channels. Default YES. To not
+%   CAR include ['CAR',''] in varargin.
+% 
+% EXAMPLES
+% convertOpenEphysToDat_CAR('continuous')
+% convertOpenEphysToDat_CAR('continuous','nChan',64,'processor',100,'CAR','')
+%
 % -------------------------------------------------------------------------
 % Cecília Pardo-Bellver, 2021
 % Laboratory of Network Neurophysiology
@@ -14,7 +31,7 @@ addOptional(prs,'datadir',cd,@(s)isempty(s)|isdir(s))  % data directory
 addOptional(prs,'resdir','',@(s)isempty(s)|isdir(s))   % results directory
 addOptional(prs,'nChan',32,@isnumeric)   % Number of channels (default: 32 channels)
 addOptional(prs,'processor',101,@isnumeric) % Processor number, default 101
-addParameter(prs,'reference','common_avg',@(s)ischar(s)|isempty(s))   % switch for referencing
+addParameter(prs,'CAR','common_avg',@(s)ischar(s)|isempty(s))   % switch for referencing
 parse(prs,varargin{:})
 ops = prs.Results;
 
@@ -64,7 +81,7 @@ for kk = 1:nBlocks
             samples(:,jj)         = collectSamps;
         end
         
-        switch ops.reference
+        switch ops.CAR
             case 'common_avg'
                 common_avg = int16(median(samples,2));
                 samples = samples - common_avg;
