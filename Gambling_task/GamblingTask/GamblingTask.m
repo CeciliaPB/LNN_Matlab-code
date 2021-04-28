@@ -37,7 +37,7 @@ if isempty(fieldnames(S))  % If settings file was an empty struct, populate stru
     % GUI parameters. It's interactive, you can change it during the task
     S.GUI.TT1_PanicButon  = 0;  % For Trial Type 1 Imposition
     S.GUI.TT2_PanicButon  = 0;  % For Trial Type 2 Imposition
-    S.GUI.RewardSmall     = 2;  % ul Small reward amount  
+    S.GUI.RewardSmall     = 1;  % ul Small reward amount  
     S.GUI.RewardBig       = 8;  % ul Big reward amount 
     S.GUI.SinWavekHz1     = 04; % Cue tone #1 in kHz - tone #1
     S.GUI.SinWavedB1      = 60; % Cue tone #1 dB SPL
@@ -113,6 +113,9 @@ TrialType(1:20) = Trials(randperm(length(Trials))); % Random permutation of cued
 if S.TrainingStage == 1 % Alternates sides
     TrialType          = ones(1,MaxTrials);
     TrialType(1:2:end) = 2;
+elseif S.TrainingStage == 3
+    TrialType(1:3)     = 1;
+    TrialType(4:6)     = 2;
 end
 BpodSystem.Data.TrialTypes = []; % The trial type of each trial completed will be added here.
 
@@ -124,6 +127,7 @@ if     S.TrainingStage == 3
     UsOutcome1(p <= S.SafeProb) = 1; % Safe side
     UsOutcome2(p <= S.RiskProb) = 2; % Risk side 
     UsOutcome2(p <= (S.RiskProb + S.PunishProb)& p > S.RiskProb) = 3; % Punishment
+    UsOutcome2(1:6) = 2;
 elseif S.TrainingStage == 2
     UsOutcome1 = repmat(2,1,length(Trials)); % Small reward always
 elseif S.TrainingStage == 1
@@ -504,11 +508,16 @@ if S.TrainingStage == 3 %introducing a cue and delay
         end
         
         if currentTrial > 20
+            LastTrials = sum(TrialType(currentTrial-6):TrialType(currentTrial-1));
             if     TT1_PanicButon == 1 || Correction == 1
                 TrialType(currentTrial) = 1;
             elseif TT2_PanicButon == 1 || Correction == 2
                 TrialType(currentTrial) = 2;
-            else 
+            elseif LastTrials == 5
+                TrialType(currentTrial) = 2;
+            elseif LastTrials == 10
+                TrialType(currentTrial) = 1;
+            else
                 TrialType(currentTrial) = ceil(rand(1,1)*2);
             end
         else 
