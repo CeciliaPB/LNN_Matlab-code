@@ -1,4 +1,4 @@
-function [event] = load_events(sessionpath)
+function [event, pulseon, pulseoff] = load_events(sessionpath)
 
 %   Creates a structure of events, each eventChannel in one variable.
 %   INPUTS:
@@ -7,7 +7,7 @@ function [event] = load_events(sessionpath)
 % -------------------------------------------------------------------------
 % Cecília Pardo-Bellver, 2021
 % Laboratory of Network Neurophysiology
-% Institute of Experimantal Medicine, Hungary.
+% Institute of Experimental Medicine, Hungary.
 % -------------------------------------------------------------------------
 
 % Load open ephys events file

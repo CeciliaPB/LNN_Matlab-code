@@ -1,10 +1,9 @@
+function OutcomePlot_Gambling12(AxesHandle, Action, varargin)
+%
+% -------------------------------------------------------------------------
 %{
-----------------------------------------------------------------------------
-
 This file is part of the Bpod Project
 Copyright (C) 2014 Joshua I. Sanders, Cold Spring Harbor Laboratory, NY, USA
-
-----------------------------------------------------------------------------
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,8 +16,7 @@ See the GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %}
-% function OutcomePlot(AxesHandle,TrialTypeSides, OutcomeRecord, CurrentTrial)
-function OutcomePlot_Gambling12(AxesHandle, Action, varargin)
+% -------------------------------------------------------------------------
 %
 % My input: OutcomePlot_Gambling12(BpodSystem.GUIHandles.OutcomePlot,'init',1-TrialType, UsOutcome1);
 %           OutcomePlot_Gambling12(BpodSystem.GUIHandles.OutcomePlot,'update',Data.nTrials+1,1-TrialType,Outcomes, UsOutcome)%
@@ -51,11 +49,9 @@ function OutcomePlot_Gambling12(AxesHandle, Action, varargin)
 % Kachi O. 2014.Mar.17
 %
 % -------------------------------------------------------------------------
-% Based on code provided by Heguedus Panna
-%
-% Cecília Pardo-Bellver, 2020
+% Modified by Cecília Pardo-Bellver, 2020
 % Laboratory of Network Neurophysiology
-% Institute of Experimantal Medicine, Hungary.
+% Institute of Experimental Medicine, Hungary.
 % -------------------------------------------------------------------------
 
 %% Code Starts Here

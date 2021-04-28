@@ -18,13 +18,13 @@ function read_openephys_CP(varargin)
 %
 %   See also OEDISC.
 % -------------------------------------------------------------------------
-%   Balazs Hangya and Panna Hegedus
+%   Balazs Hangya
 %   Laboratory of Systems Neuroscience
 %   Institute of Experimental Medicine, Budapest, Hungary
 %
 %   Modified by Cecília Pardo-Bellver, 2021
 %   Laboratory of Network Neurophysiology
-%   Institute of Experimantal Medicine, Hungary.
+%   Institute of Experimental Medicine, Hungary.
 % -------------------------------------------------------------------------
 
 % Default arguments
@@ -49,6 +49,9 @@ if isequal(g.datadir(end),'\')
     g.datadir = g.datadir(1:end-1);
 end
 
+% Threshold
+Th = 40;
+
 % if isempty(g.resdir)
 %     if any(ismember(g.datadir,'-'))
 %         sessiontag = 'a';
@@ -71,7 +74,7 @@ SaveFeatures = true;   % save MClust feature files
 % Common average reference
 switch g.reference
     case 'common_avg'
-        common_avg = common_avg_ref(g.datadir,32,[],g.rawdatafiletag);
+        common_avg = common_avg_ref(g.datadir,NumChannels,[],g.rawdatafiletag,'processor',100);
     case {'','none'}
         common_avg = 0;
     otherwise
@@ -93,7 +96,7 @@ for iT = g.TTspec
         error('Timestamp error.')
     end
     
-    [AllTimeStamps, AllWaveForms] = oedisc(data,tss,info.header.sampleRate,30,[]);   % filter and detect spikes
+    [AllTimeStamps, AllWaveForms] = oedisc(data,tss,info.header.sampleRate,Th,[]);   % filter and detect spikes
     TimeStamps = AllTimeStamps{1};
     WaveForms = AllWaveForms{1};
     TTname = ['TT' num2str(iT)];
@@ -103,8 +106,17 @@ for iT = g.TTspec
     if SaveFeatures   % pre-calculate MClust features
         TTdata.TimeStamps = TimeStamps;
         TTdata.WaveForms = WaveForms;
-        openephys_SaveMClustFeatures(TTdata,{'Amplitude';'Energy';'WavePC1';'Time'},[1 1 1 1],TT_path)
+        openephys_SaveMClustFeatures(TTdata,{'Amplitude';'Energy';'WavePC1';'WavePC2';'Time'},[1 1 1 1],TT_path)
     end
     
-    clearvars -except g common_avg filepath resdir SaveFeatures iT
+    clearvars -except g common_avg filepath resdir SaveFeatures iT Th
+end
+
+% Save PulsePal TTLs ------------------------------------------------------
+[event, pulseon, pulseoff] = load_events(g.datadir);
+fnm = fullfile(g.resdir,'event.mat');
+save(fnm,'event');
+
+fnm = fullfile(g.resdir,'lightevent.mat');
+save(fnm,'pulseon','pulseoff');
 end
