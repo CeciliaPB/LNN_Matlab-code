@@ -45,7 +45,7 @@ function [wdata, wfreq] = wavelet_analysis(signal,time,tsegment,freq,varargin)
 % -------------------------------------------------------------------------
 % Cecília Pardo-Bellver, 2019
 % Laboratory of Network Neurophysiology
-% Institute of Experimantal Medicine, Hungary.
+% Institute of Experimental Medicine, Hungary.
 %
 % Wavelet software was provided by C. Torrence and G. Compo. See wavelet
 % function for more details.

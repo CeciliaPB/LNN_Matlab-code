@@ -23,7 +23,7 @@ function [ISIh, ISIbins] = ISI_hist(neuron,varargin)
 % -------------------------------------------------------------------------
 % Cecília Pardo-Bellver, 2019
 % Laboratory of Network Neurophysiology
-% Institute of Experimantal Medicine, Hungary.
+% Institute of Experimental Medicine, Hungary.
 %
 % Uses code from MClust, MEX-file ndhist.
 % -------------------------------------------------------------------------
@@ -41,7 +41,7 @@ s = 0;
 if nargin
   for i=1:size(varargin,2)
     switch varargin{i}
-      case 'nBins'
+      case 'bins'
         bins = varargin{i+1};
       case 's'
         s = 1;
@@ -64,7 +64,8 @@ plot(isiB, isiH);
 set(gca, 'XScale', 'log', 'XLim', [10^minLogISI 10^maxLogISI]);
 set(gca, 'YTick', max(isiH));
 hold on
-plot([1 1], get(gca, 'YLim'), 'r:')
+plot([1 1], get(gca, 'YLim'), 'r:','LineWidth',2);
+title(['InterSpike Interval - Neuron ',neuron(1:end-4)],'Interpreter','none');
 hold off
 
 if nargout > 0

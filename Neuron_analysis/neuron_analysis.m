@@ -17,20 +17,21 @@ function neuron_analysis(neuron, varargin)
 %   - 'XCorr': calculates the cross correlation.
 %   - 'ACorr': calculates the auto-correlation.
 %   - 's': saves the figure in the specified file format (jpg, png, svg,
-%   etc.). See saveas help for more info. Default NOT save.
+%   etc.), this format can be changed in the 'type' variable in line 53.
+%   See saveas help for more info. Default NOT save. Default format 'jpg'.
 %
 % OUTPUTS: 
 %   - the calculated variables are automatically saved inside the neuron
 %   variable.
 %   
 % Examples: 
-% neuron_analysis(n);
+% neuron_analysis(neuron);
 % neuron_analysis(neuron,'wf','plot','mean','ISI');
 % 
 % -------------------------------------------------------------------------
 % Cecília Pardo-Bellver, 2019
 % Laboratory of Network Neurophysiology
-% Institute of Experimantal Medicine, Hungary.
+% Institute of Experimental Medicine, Hungary.
 %
 % Uses code from MClust.
 %
@@ -40,6 +41,7 @@ function neuron_analysis(neuron, varargin)
 % Default params
 ToCalculate = {'wf', 'plot', 'mean', 'ISI', 'XCorr', 'ACorr'};
 
+% Calculations defined in varargin
 if ~isempty(varargin)
     ToCalculate = varargin;
 else
@@ -48,6 +50,7 @@ end
 s = 0;
 if max(strcmp(ToCalculate, 's')) == 1 % Save the plots
     s = 1;
+    type = 'jpg';
 elseif max(strcmp(ToCalculate, 's')) ~= 1 % Not save the plots
     s = 0;
 end
@@ -86,16 +89,15 @@ for ii = 1:size(ToCalculate,2)
             end
           
         % From the 4 possible wf selects the one with highest amplitude
-        H = [min(F2,[],2),max(F2,[],2)];
+        H  = [min(F2,[],2),max(F2,[],2)];
         H2 = H(:,2)-H(:,1);
         H3 = max(H2);
-        G = H2 == H3;
+        G  = H2 == H3;
         
         if s == 1
-%         saveas(gcf, genvarname(['TT',num2str(GR),'_',num2str(nr),...
-%             '_',num2str(G), '_wf']), 'svg');
-        saveas(gcf, genvarname(['TT',num2str(GR),'_',num2str(nr),...
-            '_',num2str(G), '_wf']), 'jpg');
+            title(['Waveform - ', neuron(1,1:end-4),' - CH', num2str(G)],'Interpreter','none');
+            saveas(gcf, genvarname([neuron(1,1:end-4),...
+                 '_',num2str(G), '_wf']), type);
         elseif s ~= 1
         end 
 
@@ -103,10 +105,9 @@ for ii = 1:size(ToCalculate,2)
         [ISIh, ISIbins] = ISI_hist(neuron);
                 
         if s == 1
-%         saveas(gcf, genvarname(['TT',num2str(GR),'_',num2str(nr),...
-%             '_ISIhist']), 'svg');
-        saveas(gcf, genvarname(['TT',num2str(GR),'_',num2str(nr),...
-            '_ISIhist']), 'jpg');
+            title(['ISI - ', neuron(1,1:end-4)],'Interpreter','none');
+            saveas(gcf, genvarname([neuron(1,1:end-4),...
+                  '_ISIhist']), type);
         elseif s ~= 1
         end
        
@@ -114,10 +115,9 @@ for ii = 1:size(ToCalculate,2)
         [XCorrVals,XCorrX] = XCorrelogram(neuron, neuron, 'bins', 2);
         
         if s == 1
-%         saveas(gcf, genvarname(['TT',num2str(GR),'_',num2str(nr),...
-%             '_XCorr']), 'svg');
-        saveas(gcf, genvarname(['TT',num2str(GR),'_',num2str(nr),...
-            '_XCorr']), 'jpg');
+            title(['XCorr - ', neuron(1,1:end-4)],'Interpreter','none');
+            saveas(gcf, genvarname([neuron(1,1:end-4),...
+                 '_XCorr']), type);
         elseif s ~= 1
         end 
       
@@ -125,10 +125,9 @@ for ii = 1:size(ToCalculate,2)
         [ACorrVals,ACorrX] = ACorrelogram(neuron);
         
         if s == 1
-%         saveas(gcf, genvarname(['TT',num2str(GR),'_',num2str(nr),...
-%             '_ACorr']), 'svg');
-        saveas(gcf, genvarname(['TT',num2str(GR),'_',num2str(nr),...
-            '_ACorr']), 'jpg');
+            title(['ACorr - ', neuron(1,1:end-4)],'Interpreter','none');
+            ssaveas(gcf, genvarname([neuron(1,1:end-4),...
+                 '_ACorr']), type);
         elseif s ~= 1
         end
   

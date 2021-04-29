@@ -1,9 +1,9 @@
-function [HISTvals,X] = ACorrelogram(n1, varargin)
+function [HISTvals,X] = ACorrelogram(neuron, varargin)
 
 % This function cauculates the autocorrelation of a neuron neurons.
 %
 % INPUT: 
-%   - n1: .mat file with thw timestamps of the neuron. ex. 'GR1_1.mat'
+%   - neuron: .mat file with thw timestamps of the neuron. ex. 'GR1_1.mat'
 %   Varargin
 %   - 'bins': bin size of choice in msec. Default 1.
 %   - 'width': msec on each side of the xcorr plot. Default 250.
@@ -16,18 +16,18 @@ function [HISTvals,X] = ACorrelogram(n1, varargin)
 %   - without output arguments, the function plots the xcorr
 % 
 % Examples: 
-% [HISTvals, X] = ACorrelogram(n1, 'bin', 1, 'width', 250, 's', 'jpg');
-% ACorrelogram(n1, 's', 'jpg');
+% [HISTvals, X] = ACorrelogram('GR1_1.mat', 'bin', 1, 'width', 250, 's', 'jpg');
+% ACorrelogram('GR1_1.mat', 's', 'jpg');
 % 
 % -------------------------------------------------------------------------
 % Cecília Pardo-Bellver, 2019
 % Laboratory of Network Neurophysiology
-% Institute of Experimantal Medicine, Hungary.
+% Institute of Experimental Medicine, Hungary.
 %
 % Uses code from MClust, MEX-file AutoCorr.
 % -------------------------------------------------------------------------
 
-load(n1,'TS');
+load(neuron,'TS');
 TS1 = TS;
 
 % Default params
@@ -58,10 +58,10 @@ if isempty(TS1)
 else
     [histvals,x] = AutoCorr(TS1, bin, width);
     bar(x,histvals,'LineStyle','none')
-    xlabel('msec')
-    xlabel(['msec (' num2str(bin) 'msec binsize)']);
+    xlabel('ms')
+    xlabel(['ms(' num2str(bin) 'ms binsize)']);
     ylabel('rate');
-    title('Autocorrelation');
+    title(['Autocorrelation - Neuron ',neuron(1:end-4)],'Interpreter','none');
     set(gca,'fontname','arial');
     
 if nargout > 0

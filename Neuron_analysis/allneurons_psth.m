@@ -1,7 +1,7 @@
 function psth = allneurons_psth(ngroup, ttl, varargin)
 
-% Get data from psth and save to mat for each neuron
-% IMPORTANT: For the analysis of pairs use ttl_psth.
+% Get data from psth and save to mat for each neuron clusered in the
+% provided ngroup.
 % 
 % INPUTS: 
 %   - ngroup: groups of neurons to perform the analysis. It can be a single
@@ -11,38 +11,43 @@ function psth = allneurons_psth(ngroup, ttl, varargin)
 % Varargin
 %   - 'fs': sampling rate. Dafault 30000.
 %   - 'Dt': Delay time, between the recording and the ttl. Ex. in case of
-%   getting the ttl from a video. Default NOT used.
+%   getting the ttl from a video. Default NOT used. In SECONDS!
 %   - 'pre': time before trigger to include in psth. Default 1s. 
 %   - 'post': time after trigger to include in psth. Default 1s.
 %   - 'bin': width of the histogram column. Adjust the 'bin', 1000 bin for
 %   0.5s; 3000 bin for 2s. 
 %   - 'excel': to save an excel of the psth. Default NOT save excel 
 %   - 's': to save the images. Default NOT save figs
+%   - 'name': Name of Valiable to be saved. Default ['psth', num2str(floor(post/fs)),
+%       's'].
 % 
 % OUTPUTS: 
 %   - psth: a structure with the spikes around the event (all and up to
 %   1st), and the mean values for the firing times of the neuron.
 %   
 % Examples: 
-% psth = allneurons_psth([1:8], ttl);
-% psth = allneurons_psth(2, ttl, 'pre',0.5,'post',0.5,'fr',30000);
+% psth = allneurons_psth([1:8], ttl); 
+% psth = allneurons_psth(2, ttl, 'pre',0.5,'post',0.5,'fr',30000); 
+% psth = allneurons_psth([1:8], sound(:,1), 'name', 'psth1s_sound',...
+%       'pre', 0.5, 'post', 1, 'Dt', -5,'s');
 % 
 % -------------------------------------------------------------------------
 % Cecília Pardo-Bellver, 2020
 % Laboratory of Network Neurophysiology
-% Instinute of Experimantal Medicine, Hungary.
-%
-% MATLAB toolboxes: - 
+% Instinute of Experimental Medicine, Hungary.
 % -------------------------------------------------------------------------
   
-% Default params
+% Default params ----------------------------------------------------------
 fs = 30000;
 pre = 0.5;
 post = 0.5;
 bin = 1000;
 excel = 0; % Default NOT save excel
 s = 0; % Default NOT save figs
+name = ['psth',num2str(floor(post/fs)),'s']; % Name of Valiable to be saved
+figname = '';
 
+% Params introduced in the varargin ---------------------------------------
 if nargin
     for ii = 1:length(varargin)
         switch varargin{ii}
@@ -62,12 +67,20 @@ if nargin
                 elseif post < 5000
                     post = post * fs;
                 end
+                if max(strcmp(varargin, 'name')) == 1
+                elseif max(strcmp(varargin, 'name')) == 0
+                    name = ['psth',num2str(floor(post/fs)),'s'];
+                end
             case 'bin'
                 bin = varargin{ii+1};
             case 'excel'
                 excel = 1;                
             case 's'
                 s = 1;
+            case 'name'
+                name = varargin{ii+1};
+                B = strfind(name,'_');
+                figname = name(B:end);
             otherwise
         end
     end
@@ -92,12 +105,13 @@ if length(files)>9
     files = files(file==1);
 end
 
-% Preallocate vars
+% Preallocate vars --------------------------------------------------------
 psth = struct;
 xls = zeros(length(files),4); % To save an excel with relevant values
 Gr_N = cell(length(files),1);
-name = ['psth',num2str(floor(pre/fs)),'s']; % Valiable to be saved
+Time = zeros(length(files),1);
 
+% Let's calculate things --------------------------------------------------
 for ii = 1:length(files)
     
     FstSpk_means = zeros(1,4);
@@ -108,19 +122,26 @@ for ii = 1:length(files)
     neuron = files{ii};
     load(neuron,'TS');
     
-    if exist('Dt', 'var') == 0
+    if exist('Dt', 'var') == 0 
         TT = ((TS(:,1)/10000)); 
     elseif exist('Dt', 'var') == 1
-        A = dir('*.continuous');
-        B = char({A.name});
-        [~, ts, ~] = load_open_ephys_data(B(1,:));
-        TT = ((TS(:,1)/10000)-(min(ts)+Dt)/60);
+        if exist('ts','var') == 0
+            A = dir('*.continuous');
+            B = char({A.name});
+            [~, ts, ~] = load_open_ephys_data(B(1,:));
+%             TT = ((TS(:,1)/10000)-(min(ts)+Dt)/60); % Convert to s
+            TT = ((TS(:,1)/10000)-(min(ts))+Dt); % Normal way
+        elseif exist('ts','var')== 1
+%             TT = ((TS(:,1)/10000)-(min(ts)+Dt)/60); % Convert to s
+            TT = ((TS(:,1)/10000)-(min(ts))+Dt); % Normal way
+        end
     end
     
-    % Calculate spike time around ttl
+    % Calculate spike time around ttl 
     [psth1,ts1,~,ts2] = ttl_psth(TT*fs, ttl*fs, bin, 'fs', fs, 'pre',...
-        pre, 'post', post, 'chart', 2);
-   
+        pre/fs, 'post', post/fs, 'chart', 2);
+    sgtitle(['NeuronID: ' neuron(1:end-4)],'Interpreter','none');
+    
     % All spikes before & after ttl            
     for jj = 1:length(ts1)
         A = cell2mat(ts1(jj,1));
@@ -144,7 +165,7 @@ for ii = 1:length(files)
         n = max(size(FstSpk,1),size(A,1));
         FstSpk(end+1:n,:) = nan;
         A(end+1:n,1) = nan;
-        FstSpk = [FstSpk, A];
+        FstSpk = [FstSpk, A]; 
     end 
     FstSpk(:,1) = [];
     FstSpk = FstSpk/fs;
@@ -169,32 +190,48 @@ for ii = 1:length(files)
     eval([name '= psth']);
     save(neuron,name,'-append');
     
-    if s == 1
+    if s == 1 % Save figure -----------------------------------------------
         saveas(gcf, matlab.lang.makeValidName([neuron(1:end-4),...
-            '_', num2str(floor(post/fs)),'s']), 'jpg')
+            '_', num2str(floor(post/fs)),'s' figname]), 'jpg')
 %         saveas(gcf, matlab.lang.makeValidName([group(1:end-4),'_',...
 %             num2str(ii),'_',num2str(floor(post/fs)),'s']), 'svg')
-    else
+    else 
+        close gcf
     end
     
-    Gr_N{ii,:} = neuron(1:end-4);
+    % Generate variable with the FstSpk_means to later save --------------- 
+    Gr_N{ii,:}  = neuron(1:end-4);
     xls(ii,1:4) = FstSpk_means;
+    Time(ii,:)  = floor(post/fs);
     clearvars -except GR Dt ttl files fs pre post bin ts TTL...
-        name sound excel sec Gr_N s excel group psth
+        name sound excel sec Gr_N s xls group psth Time figname
 %     close gcf;
 end
 
-if excel == 1
-    T = table('Size',[length(files) 5],'VariableTypes',...
-        {'string','double','double','double','double'},...
-        'VariableNames',{'Neuron','Mean','Median','Std','numSpk'});
-    T.Neuron = Gr_N;
-    T.Mean = xls(:,1);
-    T.Median = xls(:,2);
-    T.Std = xls(:,3);
-    T.numSpk = xls(:,4);
+if excel == 1 % Save excel ------------------------------------------------
+    
+    % Save neurons FstSpk_means in the GR .mat file -----------------------
+    PSTH_psth = table('Size',[length(files) 6],'VariableTypes',...
+            {'string','double','double','double','double','double'},...
+            'VariableNames',{'Neuron','T_psth','Mean','Median','Std','numSpk'});
+    PSTH_psth.T_psth = Time;
+    PSTH_psth.Neuron = Gr_N;
+    PSTH_psth.Mean = xls(:,1);
+    PSTH_psth.Median = xls(:,2);
+    PSTH_psth.Std = xls(:,3);
+    PSTH_psth.numSpk = xls(:,4);
 
-    writetable(T, [neuron(1:end-6),'.xls']);
+    varInfo = who('-file',[Gr_N{1}(1,1:end-2), '.mat']);
+    if ismember('PSTH_tab', varInfo) == 0
+        save([Gr_N{1}(1,1:end-2), '.mat'], 'PSTH_tab', '-append');
+    elseif ismember('PSTH_tab', varInfo) == 1
+        PSTH_tab2 = PSTH_psth;
+        load([Gr_N{1}(1,1:end-2), '.mat'], 'PSTH_tab');
+        PSTH_psth = [PSTH_psth;PSTH_tab2];
+        save([Gr_N{1}(1,1:end-2), '.mat'], 'PSTH_tab', '-append');
+    end
+    
+    writetable(PSTH_psth, [Gr_N{1}(1,1:end-2),'_', num2str(floor(post/fs)),'.xls']);
 else
 end
 

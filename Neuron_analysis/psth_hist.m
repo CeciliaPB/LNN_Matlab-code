@@ -17,7 +17,7 @@ function [psth_spx, psth_t] = psth_hist(psth, bins)
 % -------------------------------------------------------------------------
 % Cecília Pardo-Bellver, 2019
 % Laboratory of Network Neurophysiology
-% Institute of Experimantal Medicine, Hungary.
+% Institute of Experimental Medicine, Hungary.
 % -------------------------------------------------------------------------
 
 psth_spx = [];

@@ -1,5 +1,6 @@
 function [iFR,tFR] = instFiringRate(timestamps,time,bins)
-% iFiringRate - Instantaneous firing rate of a spike train
+
+% instFiringRate - Instantaneous firing rate of a spike train
 %   iFR = instFiringRate(timestamps, time) calculates the instantaneous
 %   firing rate at times: tFR of a spike train with spikes at times:
 %   timestamps. In the interval between two spikes n and n+1, the
@@ -11,15 +12,26 @@ function [iFR,tFR] = instFiringRate(timestamps,time,bins)
 %   spike or after the last spike in a train, this function sets iFR to zero
 %   in those intervals.
 %
-%   [iFR,tFR] = instFiringRate(timestamps) automatically picks suitable
-%   time points, in practice, just before and just after each spike.
+% INPUTS: 
+%   - timestamps: vector with timestamps of spike events.
+%   - time: vector, only needs start and end times. Make sure the units in
+%   time and timestamps are matching. 
+%   - bins:  bin size of interval. If not provided: Default 100 = 0.01s.
+%
+% OUTPUTS: 
+%   - iFR: Instantaneous firing rate. Vector.
+%   - tFR: Calculated time vector.
+%
+% Examples 
+%   [iFR,tFR] = instFiringRate(timestamps, time); 
+%   [iFR,~]   = instFiringRate(timestamps,time,100);
 %
 % -------------------------------------------------------------------------
 % Based on instantfr.m by Daniel A. Wagenaar.
 % 
 % Cecília Pardo-Bellver, 2020
 % Laboratory of Network Neurophysiology
-% Instinute of Experimantal Medicine, Hungary.
+% Instinute of Experimental Medicine, Hungary.
 % -------------------------------------------------------------------------
  
 % Params ------------------------------------------------------------------
@@ -33,11 +45,13 @@ else
     tFR = min(time):bins:max(time);
 end
 
+% Calculate time difference between spikes --------------------------------
 tt0 = [timestamps(:)' - epsi; timestamps(:)' + epsi];
 idt = [diff([0 timestamps(:)']); diff([timestamps(:)' inf])];
 tt0 = tt0(:)';
 idt = idt(:)';
 
+% Calculate the instantaneous firing rate ---------------------------------
 if nargin < 2
   iFR = 1./idt(2:end-1);
   tFR = tt0(2:end-1);

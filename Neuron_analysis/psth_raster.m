@@ -21,7 +21,7 @@ function [rastmat, timevec] = psth_raster(trialspx,pre,post,varargin)
 % -------------------------------------------------------------------------
 % Cecília Pardo-Bellver, 2019
 % Laboratory of Network Neurophysiology
-% Institute of Experimantal Medicine, Hungary.
+% Institute of Experimental Medicine, Hungary.
 %
 % Based on mraster by Maik C. Stttgen, Feb 2011
 % -------------------------------------------------------------------------

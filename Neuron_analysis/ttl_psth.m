@@ -31,7 +31,7 @@ function [psth, ts, psth_1st, ts_1st] = ttl_psth(spktimes,trigtimes,bins,varargi
 % -------------------------------------------------------------------------
 % Cecília Pardo-Bellver, 2019
 % Laboratory of Network Neurophysiology
-% Institute of Experimantal Medicine, Hungary.
+% Institute of Experimental Medicine, Hungary.
 %
 % Based on mpsth by Maik C. Stttgen, Feb 2011
 % -------------------------------------------------------------------------
@@ -43,7 +43,7 @@ post  = 1 * fs;
 binsz = 1;
 chart = 0;
 
-% Varargin params
+% Varargin params ---------------------------------------------------------
 if nargin
   for ii=1:2:size(varargin,2)
     switch varargin{ii}
@@ -72,7 +72,7 @@ if nargin
 else
 end
 
-% pre-allocate for speed
+% Pre-allocate for speed --------------------------------------------------
 if binsz>1
   psth = zeros(ceil(pre/binsz +post/binsz),2); % one extra chan for timebase
   psth (:,1) = (-1*pre:binsz:post-1); % time base
@@ -86,7 +86,7 @@ elseif binsz==1
   psth_1st (:,1) = (-1*pre:1:post);
 end
 
-% construct psth & trialspx
+% Construct psth & trialspx -----------------------------------------------
 ts = cell(numel(trigtimes),1);
 for ii = 1:numel(trigtimes)
   clear spikes
@@ -107,7 +107,7 @@ for ii = 1:numel(trigtimes)
   end
 end
 
-% construct psth & trialspx up to the first spike after the trigger
+% Construct psth & trialspx up to the first spike after the trigger -------
 ts_1st = cell(numel(trigtimes),1);
 for ii = 1:numel(trigtimes)
   clear spikes
@@ -136,10 +136,36 @@ for ii = 1:numel(trigtimes)
   
 end
 
-% plot
-if chart==1
-  figure('name','Peri-stimulus time histogram','units','normalized','position',[0.3 0.4 0.4 0.2])
+% Plot --------------------------------------------------------------------
+if chart == 1
+  figure('name','Peri-stimulus time histogram','units','normalized',...
+      'position',[0.3 0.3 0.3 0.4])
   
+  subplot(211)
+  rastmat = zeros(numel(ts),pre+1+post);
+  timevec = -pre:1:post;  
+  % generate raster
+    for ii = 1:numel(ts)
+        rastmat(ii,ts{ii}+pre+1) = 1;
+    end
+    rastmat(rastmat == 0) = NaN;
+    
+  for ii = 1:numel(ts)
+      plot(timevec/fs,rastmat(ii,:)*ii,'Color','k','Marker','.',...
+        'MarkerSize',4,'LineStyle','none');
+%     plot(timevec/fs,rastmat(ii,:)*ii,'Color','k','Marker','none',...
+%         'MarkerSize',4,'LineStyle','none');
+%     text(timevec/fs,rastmat(ii,:)*ii,'|','FontWeight','bold','Color',[0.4 0.4 0.4]);
+    hold on;
+  end
+  hold on; h= get(gca,'ylim');
+  plot([0 0],[h(1) numel(ts)+0.5],'r','LineWidth',1);  hold off;
+  axis([min(timevec/fs) max(timevec/fs) 0 numel(ts)+0.5]);
+  title('PSTH of the spikes around the TTL');
+  ylabel('Trials');
+  clearvars rastmat
+  
+  subplot(212)
   [psth_spx, psth_t] = psth_hist(psth, bins);
   psth_t = psth_t + 0.5*bins;
   bar((psth_t/fs),psth_spx,'EdgeColor',[0 0.4470 0.7410]);
@@ -154,8 +180,9 @@ if chart==1
 
   set(gca,'fontname','arial');
   
-elseif chart==2
-  figure('name','Peri-stimulus time histogram','units','normalized','position',[0.3 0.3 0.4 0.3])
+elseif chart == 2
+  figure('name','Peri-stimulus time histogram','units','normalized',...
+      'position',[0.3 0.3 0.4 0.3])
   
   subplot(223)
   [psth_spx, psth_t] = psth_hist(psth, bins);
@@ -179,12 +206,14 @@ elseif chart==2
     end
     
   for ii = 1:numel(ts)
-    plot(timevec/fs,rastmat(ii,:)*ii,'Color','k','Marker','.','MarkerSize',4,'LineStyle','none');
+    plot(timevec/fs,rastmat(ii,:)*ii,'Color','k','Marker','.',...
+        'MarkerSize',4,'LineStyle','none');
     hold on;
   end
   hold on; h= get(gca,'ylim');
   plot([0 0],[h(1) numel(ts)+0.5],'r','LineWidth',1);  hold off;
   axis([min(timevec/fs) max(timevec/fs) 0.5 numel(ts)+0.5]);
+  title('PSTH of the spikes around the TTL');
   ylabel('Trials');
   
   subplot(222)
@@ -196,12 +225,14 @@ elseif chart==2
     end
     
   for ii = 1:numel(ts_1st)
-    plot(timevec/fs,rastmat(ii,:)*ii,'Color','k','Marker','.','MarkerSize',4,'LineStyle','none');
+    plot(timevec/fs,rastmat(ii,:)*ii,'Color','k','Marker','.',...
+        'MarkerSize',4,'LineStyle','none');
     hold on;
   end
   hold on; h= get(gca,'ylim'); 
   plot([0 0],[h(1) numel(ts_1st)]+0.5,'r','LineWidth',1);  hold off;
   axis([min(timevec/fs) max(timevec/fs) 0.5 numel(ts_1st)+0.5]);
+  title('PSTH up to the FIRST spike after the TTL');
   ylabel('Trials');
   
   subplot(224)
