@@ -28,8 +28,8 @@ function read_openephys_probe2(varargin)
 prs = inputParser;
 addOptional(prs,'datadir',cd,@(s)isempty(s)|isdir(s))   % data directory
 addOptional(prs,'resdir','',@(s)isempty(s)|isdir(s))   % results directory
-addOptional(prs,'CHspec',32,@isnumeric)   % Number of channels (default: 32 channels)
-addOptional(prs,'TTspec',1:8,@isnumeric)   % Number of tetrodes (default, 8 tetrodes)
+addOptional(prs,'CHspec',64,@isnumeric)   % Number of channels (default: 32 channels)
+addOptional(prs,'TTspec',1:16,@isnumeric)   % Number of tetrodes (default, 8 tetrodes)
 addOptional(prs,'rawdatafiletag','',@ischar)   % switch for filtering
 addOptional(prs,'processor',101,@isnumeric) % Processor number, default 101
 addParameter(prs,'reference','common_avg',@(s)ischar(s)|isempty(s))   % switch for referencing
@@ -40,7 +40,7 @@ Th = 35;  % Threshold for the spike detection
 
 % Tetrode organization of the channels
 if nargin < 3 || isempty(g.CHspec)
-    g.CHspec = 32;
+    g.CHspec = 64;
     NumTetrodes = g.CHspec / 4;
     g.TTspec = 1:NumTetrodes;
 end
