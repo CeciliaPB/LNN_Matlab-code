@@ -56,7 +56,8 @@ load(neuron,'TS');
 A = TS/10000;
 C = zeros(length(TimeStamps),1);
 time = linspace(0, 0.9, size(WaveForms,3)); 
-% time in ms, 0 to 0.9 defined by the oedisc_probe waveform window
+% NOTE: time in ms, 0 to 0.9 defined by the oedisc_probe waveform window
+% Waveform length (27 units) = 900us; 15 units = 500us.
 
 % Timestamps relative to the neuron ---------------------------------------
 for kk = 1:length(A)

@@ -1,4 +1,4 @@
-function ops = convertOpenEphysToDat_CAR(filename,varargin)
+function convertOpenEphysToDat_CAR(filename,varargin)
 
 % Convert OpenEphys .continuous files to ONE .dat file. Default CAR.
 %
@@ -20,9 +20,9 @@ function ops = convertOpenEphysToDat_CAR(filename,varargin)
 % -------------------------------------------------------------------------
 % Cecília Pardo-Bellver, 2021
 % Laboratory of Network Neurophysiology
-% Instinute of Experimental Medicine, Hungary.
+% Institute of Experimental Medicine, Hungary.
 %
-% MATLAB toolboxes: - Statistics and Machine Learning Toolbox 
+% Based in convertOpenEphysToRawBInary from Kilosort2.
 % -------------------------------------------------------------------------
 
 % Default arguments
@@ -33,17 +33,17 @@ addOptional(prs,'nChan',32,@isnumeric)   % Number of channels (default: 32 chann
 addOptional(prs,'processor',101,@isnumeric) % Processor number, default 101
 addParameter(prs,'CAR','common_avg',@(s)ischar(s)|isempty(s))   % switch for referencing
 parse(prs,varargin{:})
-ops = prs.Results;
+params = prs.Results;
 
-fname       = fullfile(ops.datadir, sprintf('%s.dat', filename)); 
-if ~isempty(ops.resdir)
-    fname       = fullfile(ops.resdir, sprintf('%s.dat', filename));
+fname       = fullfile(params.datadir, sprintf('%s.dat', filename)); 
+if ~isempty(params.resdir)
+    fname   = fullfile(params.resdir, sprintf('%s.dat', filename));
 end
 fidout      = fopen(fname, 'w');
  
 clear files
-for jj = 1:ops.nChan
-   files{jj} = dir(fullfile(ops.datadir, sprintf([num2str(ops.processor) '_CH%d.continuous'], jj)));
+for jj = 1:params.nChan
+   files{jj} = dir(fullfile(params.datadir, sprintf([num2str(params.processor) '_CH%d.continuous'], jj)));
 end
 
 nblocks = cellfun(@(x) numel(x), files);
@@ -54,12 +54,11 @@ end
 nBlocks     = unique(nblocks);
 nSamples    = 1024;  % fixed to 1024 for now!
 
-fid = cell(ops.nChan, 1);
+fid = cell(params.nChan, 1);
 
-tic
 for kk = 1:nBlocks
-    for jj = 1:ops.nChan
-        fid{jj}             = fopen(fullfile(ops.datadir, files{jj}(kk).name));
+    for jj = 1:params.nChan
+        fid{jj}             = fopen(fullfile(params.datadir, files{jj}(kk).name));
         % discard header information
         fseek(fid{jj}, 1024, 0);
     end
@@ -68,8 +67,8 @@ for kk = 1:nBlocks
     flag = 1;
     
     while 1
-        samples = zeros(nSamples * 1000, ops.nChan, 'int16');
-        for jj = 1:ops.nChan
+        samples = zeros(nSamples * 1000, params.nChan, 'int16');
+        for jj = 1:params.nChan
             collectSamps = zeros(nSamples * 1000, 1, 'int16'); 
             rawData      = fread(fid{jj}, 1000 * (nSamples + 6),...
                 '1030*int16', 10, 'b');
@@ -81,7 +80,7 @@ for kk = 1:nBlocks
             samples(:,jj)         = collectSamps;
         end
         
-        switch ops.CAR
+        switch params.CAR
             case 'common_avg'
                 common_avg = int16(median(samples,2));
                 samples = samples - common_avg;
@@ -107,9 +106,9 @@ for kk = 1:nBlocks
             break;
         end
     end
-    ops.nSamplesBlocks(kk) = nsamps;
+    params.nSamplesBlocks(kk) = nsamps;
     
-    for jj = 1:ops.nChan
+    for jj = 1:params.nChan
        fclose(fid{jj}); 
     end
     
@@ -117,4 +116,4 @@ end
     
 fclose(fidout);
 
-toc
+end

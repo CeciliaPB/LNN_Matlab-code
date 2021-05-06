@@ -1,7 +1,7 @@
 %% VIDEO ANALYSIS: Steps to perform.
 % Requires the Computer Vision System & Image Processing Toolboxes
 % Remember to comment ALL steps you don't need
-sd% The parameters to adjust are (in order of relevance): 1) The DETECTOR;...
+% The parameters to adjust are (in order of relevance): 1) The DETECTOR;...
 % 2) The MASKs; 3) The BLOB.
 
 % Read the video and plot the audio to select the times to analyse

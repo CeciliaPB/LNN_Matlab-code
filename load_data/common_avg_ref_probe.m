@@ -10,6 +10,8 @@ function common_avg = common_avg_ref_probe(filepath,varargin)
 %   See also LOAD_OPEN_EPHYS_DATA.
 %
 % -------------------------------------------------------------------------
+% To use with probe recordings and Add Option to change the number of the
+% processor.
 % Modified by Cecília Pardo-Bellver, 2019
 % Laboratory of Network Neurophysiology
 % Institute of Experimental Medicine, Hungary.

@@ -11,6 +11,7 @@ function common_avg = common_avg_ref(filepath,varargin)
 %
 %   Panna Hegedüs, Balazs Hangya 2017/09
 %
+%   Add Option to change the number of the processor
 %   Modified by Cecília Pardo-Bellver, 2021
 %   Laboratory of Network Neurophysiology
 %   Institute of Experimental Medicine, Hungary.

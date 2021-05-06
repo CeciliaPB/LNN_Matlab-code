@@ -16,6 +16,7 @@ function [AllTimeStamps, AllWaveForms] = oedisc_probe(data,ts,sr,thr,varargin)
 %   hangya.balazs@koki.mta.hu
 %   30-Jan-2018
 %
+%   To use with probe recordings instead of tetrodes.
 %   Modified by Cecília Pardo-Bellver, 2021
 %   Laboratory of Network Neurophysiology
 %   Institute of Experimental Medicine, Hungary.

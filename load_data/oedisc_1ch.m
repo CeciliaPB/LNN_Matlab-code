@@ -16,6 +16,7 @@ function [AllTimeStamps, AllWaveForms] = oedisc_1ch(data,ts,sr,thr,varargin)
 %   hangya.balazs@koki.mta.hu
 %   30-Jan-2018
 %
+%   Add Option do it for only 1 channel.
 %   Modified by Cecília Pardo-Bellver, 2021
 %   Laboratory of Network Neurophysiology
 %   Institute of Experimental Medicine, Hungary.
@@ -28,15 +29,14 @@ addRequired(prs,'data',@isnumeric)   % raw or filtered data
 addRequired(prs,'ts',@isnumeric)   % timestamps
 addRequired(prs,'sr',@isnumeric)   % sampling rate
 addRequired(prs,'thr',@isnumeric)   % discrimination threshold
-addOptional(prs,'resdir',['C:' filesep 'Balazs' filesep '_data' filesep 'Intan' filesep 'Tina' filesep],...
-    @(s)ischar(s)|isempty(s))   % results directory
+addOptional(prs,'resdir', cd, @(s)ischar(s)|isempty(s))   % results directory
 addParameter(prs,'Filtering','enable',@(s)ischar(s)|...
     ismember(s,{'disable','enable'}))   % switch for filtering
 parse(prs,data,ts,sr,thr,varargin{:})
 g = prs.Results;
 
 % File name
-savestr0 = ['save(''' g.resdir filesep 'TT'];
+savestr0 = ['save(''' g.resdir filesep 'GR'];
 
 % Sampling rate
 nqf = sr / 2;   % Nyquist freq.

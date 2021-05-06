@@ -9,6 +9,8 @@ function common_avg = common_avg_1ch(filepath,varargin)
 %
 %   See also LOAD_OPEN_EPHYS_DATA.´
 % -------------------------------------------------------------------------
+% Add Option to change the number of the processor and leaves only 1
+% channel to use as common reference.
 % Modified by Cecília Pardo-Bellver, 2019
 % Laboratory of Network Neurophysiology
 % Institute of Experimental Medicine, Hungary.

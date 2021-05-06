@@ -21,8 +21,13 @@ function read_openephys_probe2(varargin)
 %   Balazs Hangya
 %   Laboratory of Systems Neuroscience
 %   Institute of Experimental Medicine, Budapest, Hungary
-%
+% -------------------------------------------------------------------------
+% To use with probe recordings and Add Option to change the number of the
+% processor, and the channel name doesn't include the "_CH" part.
 %   Cecília Pardo-Bellver, 2019
+% Laboratory of Network Neurophysiology
+% Institute of Experimental Medicine, Hungary.
+% -------------------------------------------------------------------------
 
 % Default arguments
 prs = inputParser;

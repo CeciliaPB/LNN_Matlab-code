@@ -6,7 +6,7 @@
 % were split to syncrhonise the behaviour of the animal with the stimuli
 % and the licking, then recorded with the Intan Evaluation Board.
 %
-% To track the movement of the animals use the Tracking.mat script.
+% To track the movement of the animals use the Tracking_detection.mat script.
 % Generates the track and inout variables to be used in this script.
 % 
 % STEP 1: Calculates and saves the TTLs. We use SHOCK, SOUND and LIGHT.
@@ -18,7 +18,7 @@
 % -------------------------------------------------------------------------
 % Cecília Pardo-Bellver, 2020
 % Laboratory of Network Neurophysiology
-% Instinute of Experimantal Medicine, Hungary.
+% Institute of Experimental Medicine, Hungary.
 %
 % MATLAB toolboxes: - Computer Vision System 
 %                   - Image Processing 

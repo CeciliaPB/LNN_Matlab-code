@@ -22,7 +22,13 @@ function read_openephys_probe(varargin)
 %   Laboratory of Systems Neuroscience
 %   Institute of Experimental Medicine, Budapest, Hungary
 %
-%   Cecília Pardo-Bellver, 2019
+% -------------------------------------------------------------------------
+% To use with probe recordings and Add Option to change the number of the
+% processor.
+% Modified by Cecília Pardo-Bellver, 2019
+% Laboratory of Network Neurophysiology
+% Institute of Experimental Medicine, Hungary.
+% -------------------------------------------------------------------------
 
 % Default arguments
 prs = inputParser;

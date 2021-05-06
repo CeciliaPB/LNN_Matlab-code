@@ -16,9 +16,7 @@ function channel_map(CHfolder, processor, probe)
 % -------------------------------------------------------------------------
 % Cecília Pardo-Bellver, 2019
 % Laboratory of Network Neurophysiology
-% Institute of Experimantal Medicine, Hungary.
-%
-% MATLAB toolbox: Signal Processing Toolbox.
+% Institute of Experimental Medicine, Hungary.
 % -------------------------------------------------------------------------
 
 % Channel order -----------------------------------------------------------
