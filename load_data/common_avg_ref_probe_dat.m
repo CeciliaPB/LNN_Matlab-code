@@ -1,4 +1,4 @@
-function common_avg = common_avg_ref_probe_dat(filepath,lastEL,varargin)
+function common_avg = common_avg_ref_probe_dat(filepath,lastEL,info,varargin)
 %COMMON_AVG_REF   Common average referencing.
 %   AVG = COMMON_AVG_REF(PATH) calculates average of 32 open ephys
 %   recording channels for performing offline common average referencing.
@@ -23,13 +23,10 @@ prs = inputParser;
 addRequired(prs,'filepath',@(s)exist(s,'dir'))   % data path
 addOptional(prs,'channel_number',32,@isnumeric)   % number of recording channels
 addOptional(prs,'exclude_channels',[],@isnumeric)   % exclude these channels from averaging
-addOptional(prs,'rawdatafiletag','',@ischar)   % tags for raw data filenames
-addOptional(prs,'processor',101,@isnumeric) % Processor number, default 101
 parse(prs,filepath,varargin{:})
 g = prs.Results;
 
 % Calculate sum of all channels
-info = load_open_ephys_binary([cd '\structure.oebin'],'continuous',1, 'mmap');
 channelsum = [];
 for iC = 1:g.channel_number
     if ~ismember(iC,g.exclude_channels)   % exclude channels

@@ -1,11 +1,12 @@
-function read_openephys_probe_dat(probe, varargin)
+function read_openephys_probe_dat(varargin)
 %READ_OPENEPHYS   Spike detection for open ephys data.
 %   READ_OPENEPHYS loads open ephys continuous files, subtracts the average
 %   of all channels (referencing), performs filtering, censoring and spike
 %   detection of tetrode channels. Files are savet in TT*.mat files for
 %   clustering.
 %   
-%   Probe: 'A1x32', 'Buzs32' 
+%   Required input arguments:
+%       CHMAP - channel map
 %
 %   Optional input arguments:
 %       DATADIR - path name for reading data
@@ -33,35 +34,42 @@ function read_openephys_probe_dat(probe, varargin)
 
 % Default arguments
 prs = inputParser;
+
 addOptional(prs,'datadir',cd,@(s)isempty(s)|isdir(s))   % data directory
 addOptional(prs,'resdir','',@(s)isempty(s)|isdir(s))   % results directory
 addOptional(prs,'CHspec',32,@isnumeric)   % Number of channels (default: 32 channels)
 addOptional(prs,'TTspec',1:8,@isnumeric)   % Number of tetrodes (default, 8 tetrodes)
 addOptional(prs,'rawdatafiletag','',@ischar)   % switch for filtering
 addOptional(prs,'processor',101,@isnumeric) % Processor number, default 101
+addOptional(prs,'lastTS',0,@isnumeric) % Last TimeStamp included (default: end of the recording)
+addParameter(prs,'CHmap','',@ischar)
 addParameter(prs,'reference','common_avg',@(s)ischar(s)|isempty(s))   % switch for referencing
-addParameter(prs,'lastTS',0,@isnumeric) %last TimeStamp included (default: end of the recording)
 parse(prs,varargin{:})
 g = prs.Results;
 
 Th = 35;  % Threshold for the spike detection
 
-info = load_open_ephys_binary([cd '\structure.oebin'],'continuous',1, 'mmap');
-switch g.lastTS
-    case 0
-        lastEL = length(info.Timestamps); % element of the column which belongs to the lastTS
-    otherwise
-        lastEL = find(info.Timestamps==g.lastTS*30000);
-end
-switch probe 
+switch g.CHmap 
     case 'A1x32'
         channel_map = [1 17 16 32 3 19 14 30 9 25 10 20 8 24 2 29 7 26 15 21 11 23 12 28 6 18 13 22 5 27 4 31];
         pairsNeed = 1; % we need all pairs on a linear probe
+        disp('Selected channel map: A1x32')
     case 'Buzs32'
         channel_map = [31 26 27 21 22 23 18 28 29 17 24 32 20 19 25 30 1 2 16 8 3 10 14 9 7 4 15 5 11 13 12 6];
         pairsNeed = 2; % we need only every second pair, because others would be from different shanks
+        disp('Selected channel map: Buzs32')
+    otherwise
+        error('read_openephys: Unknown channel map.')
+end       
+
+info = load_open_ephys_binary([cd '\structure.oebin'],'continuous',1, 'mmap');
+
+if g.lastTS > 0
+    lastEL = find(info.Timestamps==g.lastTS*30000);
+else
+    lastEL = length(info.Timestamps);
 end
-        
+ 
 
  % Tetrode organization of the channels
 if nargin < 3 || isempty(g.CHspec)
@@ -80,7 +88,7 @@ SaveFeatures = true;   % save MClust feature files
 % Common average reference
 switch g.reference
     case 'common_avg'
-        common_avg = common_avg_ref_probe_dat(g.datadir,lastEL,g.CHspec,[],g.rawdatafiletag,'processor', g.processor);
+        common_avg = common_avg_ref_probe_dat(g.datadir,lastEL,info); 
     case {'','none'}
         common_avg = 0;
     otherwise
@@ -92,7 +100,6 @@ for iT = g.TTspec
     [tdata, ts] = deal(cell(1,4));
     for iC = 1:4
         Ch1 = (iT - 1) * 4;
-        % [tdata{iC}, ts{iC}, info] = load_open_ephys_data([ g.datadir '\' num2str(g.processor) '_CH' num2str(Ch1+iC) g.rawdatafiletag '.continuous']);
         tdata{iC} = info.Data.Data(1).mapped(channel_map(Ch1+iC),1:lastEL);
         tdata{iC} = double(tdata{iC})'*0.195; %intan
         disp (['CH' num2str(channel_map(Ch1+iC)) 'for GR'])
@@ -127,7 +134,7 @@ for iT = 1:pairsNeed:max(g.TTspec)
         [tdata, ts] = deal(cell(1,4));
     for iC = 1:4
         Ch1 = (iT - 0.5) * 4;
-        %[tdata{iC}, ts{iC}, info] = load_open_ephys_data([ g.datadir '\' num2str(g.processor) '_CH' num2str(Ch1+iC) g.rawdatafiletag '.continuous']);
+        
         tdata{iC} = info.Data.Data(1).mapped(channel_map(Ch1+iC),1:lastEL);
         tdata{iC} = double(tdata{iC})'*0.195; %intan
         disp (['CH' num2str(channel_map(Ch1+iC)) 'for PR'])
