@@ -71,7 +71,7 @@ if nargin
     end
 end
 for nn = ngroup
-tmp = dir(['*',num2str(nn),'_','*.mat']); % all .mat that belong to the group
+tmp = dir(['GR',num2str(nn),'_','*.mat']); % all .mat that belong to the group
 files = {tmp.name}'; 
 % This reorders the files so after 1 comes 2 and not 10. Thank you MATLAB.
 if length(files)>9
@@ -112,6 +112,7 @@ for ii = 1:length(files)
     % Calculate spike time around ttl
     [psth1,ts1,~,ts2] = ttl_psth(TT*fs, ttl*fs, bin, 'fs', fs, 'pre',...
         pre, 'post', post, 'chart', 2);
+        sgtitle(['NeuronID: ' neuron(1:end-4)],'Interpreter','none');
    
     % All spikes before & after ttl            
     for jj = 1:length(ts1)
