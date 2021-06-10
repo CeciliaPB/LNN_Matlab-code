@@ -87,7 +87,7 @@ if nargin
 end
 
 for nn = ngroup
-tmp = dir(['*',num2str(nn),'_','*.mat']); % all .mat that belong to the group
+tmp = dir(['GR',num2str(nn),'_','*.mat']); % all .mat that belong to the group
 files = {tmp.name}'; 
 
 % This reorders the files so after 1 comes 2 and not 10. Thank you MATLAB.
