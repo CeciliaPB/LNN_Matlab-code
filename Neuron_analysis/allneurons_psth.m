@@ -12,8 +12,8 @@ function psth = allneurons_psth(ngroup, ttl, varargin)
 %   - 'fs': sampling rate. Dafault 30000.
 %   - 'Dt': Delay time, between the recording and the ttl. Ex. in case of
 %   getting the ttl from a video. Default NOT used. In SECONDS!
-%   - 'pre': time before trigger to include in psth. Default 1s. 
-%   - 'post': time after trigger to include in psth. Default 1s.
+%   - 'pre': time before trigger to include in psth. 
+%   - 'post': time after trigger to include in psth.
 %   - 'bin': width of the histogram column. Adjust the 'bin', 1000 bin for
 %   0.5s; 3000 bin for 2s. 
 %   - 'excel': to save an excel of the psth. Default NOT save excel 
@@ -25,8 +25,7 @@ function psth = allneurons_psth(ngroup, ttl, varargin)
 %   - psth: a structure with the spikes around the event (all and up to
 %   1st), and the mean values for the firing times of the neuron.
 %   
-% Examples: 
-% psth = allneurons_psth([1:8], ttl); 
+% Examples:  
 % psth = allneurons_psth(2, ttl, 'pre',0.5,'post',0.5,'fr',30000); 
 % psth = allneurons_psth([1:8], sound(:,1), 'name', 'psth1s_sound',...
 %       'pre', 0.5, 'post', 1, 'Dt', -5,'s');
@@ -39,13 +38,14 @@ function psth = allneurons_psth(ngroup, ttl, varargin)
   
 % Default params ----------------------------------------------------------
 fs = 30000;
-pre = 0.5;
-post = 0.5;
+pre = [];
+post = [];
 bin = 1000;
 excel = 0; % Default NOT save excel
 s = 0; % Default NOT save figs
 name = ['psth',num2str(floor(post/fs)),'s']; % Name of Valiable to be saved
 figname = '';
+
 
 % Params introduced in the varargin ---------------------------------------
 if nargin
@@ -85,6 +85,12 @@ if nargin
         end
     end
 end
+
+% Define pre and post times
+if isempty(pre) == 1 | isempty(post) == 1
+    error('Please define pre and post times (in seconds). Please see examples.');  
+end
+
 
 for nn = ngroup
 tmp = dir(['*R',num2str(nn),'_','*.mat']); % all .mat that belong to the group
@@ -177,9 +183,15 @@ for ii = 1:length(files)
     FstSpk_means(1,4) = length(FstSpk(FstSpk>0));
         
     % Calculate the firing peaks (and times) for all-spikes
-    [psth_spx, psth_t] = psth_hist(psth1, bin);
-    [AllSpk_means(:,1), AllSpk_means(:,2)] = findpeaks(psth_spx,psth_t/fs,...
-            'MinPeakHeight',0.8);
+    [psth_spx, psth_t] = psth_hist(psth1, bin); 
+    if numel(psth_spx) < 3 % there must be at least 3 samples in psth_spx for the findpeaks to work
+        AllSpk_means(1,1) = NaN; 
+        AllSpk_means(1,2) = NaN;
+        disp('Please check if fs and pre post times are correct')
+        
+    else
+        [AllSpk_means(:,1), AllSpk_means(:,2)] = findpeaks(psth_spx,psth_t/fs,...
+            'MinPeakHeight',0.8); % there must be 3 samples at least in psth_spx
     if isempty(AllSpk_means) == 1
         AllSpk_means(1,1) = NaN;
         AllSpk_means(1,2) = NaN;
