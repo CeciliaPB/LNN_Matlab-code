@@ -66,21 +66,21 @@ end
 
 % Create Trial Events structure -------------------------------------------
 if isbeh 
-%     if exist('TE.mat','file') ~= 0
-%         TE      = load('TE.mat');
-%     elseif exist('TE.mat','file') == 0
+    if exist('TE_behaviour.mat','file') ~= 0
+        TE_behaviour      = load('TE_behaviour.mat');
+    elseif exist('TE_behaviour.mat','file') == 0
         behfile = dir([fullpth filesep animalID '_GamblingTask_'...
             sessionID(1:end-1) '*.mat']);
         behfile = behfile.name;
-        TE      = TE_gamblingtask(fullfile(fullpth,behfile),1);
-%     end
+        TE_behaviour = TE_gamblingtask(fullfile(fullpth,behfile),1);
+    end
    
     if isrec
-%         if exist('TrialEvents.mat','file') ~= 0
-%             TrialEvents = load('TrialEvents.mat');
-%         elseif exist('TrialEvents.mat','file') == 0
+        if exist('TE_recording.mat','file') ~= 0
+            TE_recording = load('TE_recording.mat');
+        elseif exist('TE_recording.mat','file') == 0
             MakeTrialEvents_gambling(fullpth);% synchronize
-%         end   
+        end   
     end
 end
 
@@ -92,24 +92,26 @@ if isrec
 end
 
 % Behavior ----------------------------------------------------------------
-stg = num2str(TE.TrainingStage(1,1));
+stg = num2str(TE_behaviour.TrainingStage(1,1));
 if isbeh
-    switch (TE.TrainingStage(1,1))	
+    switch (TE_behaviour.TrainingStage(1,1))	
      case 1
         % Lick raster 
 	    H = figure;
-        TE.StimulusOn = zeros(1,length(TE.TrainingStage));
-        viewlickRL({animalID sessionID},'TE',TE,'TriggerName','StimulusOn','SortEvent',...
+        TE_behaviour.StimulusOn = zeros(1,length(TE_behaviour.TrainingStage));
+        viewlickRL({animalID sessionID},'TE',TE_behaviour,'TriggerName','StimulusOn','SortEvent',...
             'TrialStart','eventtype','behav','ShowEvents',{{'StimulusOn'}},...
             'Partitions','#TrialType','window',[-5 5],'LickSide','all');
 	    fnm = fullfile(resdir2,[animalID '_' sessionID '_Stg' stg '_Licks.jpg']);   % save
 	    saveas(H,fnm)
 	    close(H)
         
+        StageNum = bynumbers_gamblingtask(animalID,sessionID,'s');
+        
      case 2
         % Lick raster all licks, pertition trial
 	    H = figure;
-	    viewlickRL({animalID sessionID},'TE',TE,'TriggerName','StimulusOn','SortEvent',...
+	    viewlickRL({animalID sessionID},'TE',TE_behaviour,'TriggerName','StimulusOn','SortEvent',...
             'TrialStart','eventtype','behav','ShowEvents',{{'StimulusOn'}},...
             'Partitions','#TrialType','window',[-5 5],'LickSide','all');
 	    fnm = fullfile(resdir2,[animalID '_' sessionID '_Stg' stg '_Licks.jpg']);   % save
@@ -118,7 +120,7 @@ if isbeh
       
         % Lick raster R
 	    H = figure;
-	    viewlickRL({animalID sessionID},'TE',TE,'TriggerName','StimulusOn','SortEvent',...
+	    viewlickRL({animalID sessionID},'TE',TE_behaviour,'TriggerName','StimulusOn','SortEvent',...
             'TrialStart','eventtype','behav','ShowEvents',{{'StimulusOn'}},...
             'Partitions','#TrialType','window',[-5 5],'LickSide','R');
 	    fnm = fullfile(resdir2,[animalID '_' sessionID '_Stg' stg '_LicksR.jpg']);   % save
@@ -127,7 +129,7 @@ if isbeh
     
         % Lick raster L
 	    G = figure;
-	    viewlickRL({animalID sessionID},'TE',TE,'TriggerName','StimulusOn','SortEvent',...
+	    viewlickRL({animalID sessionID},'TE',TE_behaviour,'TriggerName','StimulusOn','SortEvent',...
             'TrialStart','eventtype','behav','ShowEvents',{{'StimulusOn'}},...
             'Partitions','#TrialType','window',[-5 5],'LickSide','L');
 	    fnm = fullfile(resdir2,[animalID '_' sessionID '_Stg' stg '_LicksL.jpg']);   % save
@@ -136,7 +138,7 @@ if isbeh
         
         % Lick raster TrialT1
         H = figure;
-	    viewlickTT({animalID sessionID},'TE',TE,'TriggerName','StimulusOn','SortEvent',...
+	    viewlickTT({animalID sessionID},'TE',TE_behaviour,'TriggerName','StimulusOn','SortEvent',...
             'TrialStart','eventtype','behav','ShowEvents',{{'StimulusOn'}},...
             'Partitions','#FirstLick','window',[-5 5],'LickSide','all','TrialType','1');
 	    fnm = fullfile(resdir2,[animalID '_' sessionID '_Stg' stg '_TrialT1.jpg']);   % save
@@ -145,17 +147,19 @@ if isbeh
         
         % Lick raster TrialT2
         G = figure;
-	    viewlickTT({animalID sessionID},'TE',TE,'TriggerName','StimulusOn','SortEvent',...
+	    viewlickTT({animalID sessionID},'TE',TE_behaviour,'TriggerName','StimulusOn','SortEvent',...
             'TrialStart','eventtype','behav','ShowEvents',{{'StimulusOn'}},...
             'Partitions','#FirstLick','window',[-5 5],'LickSide','all','TrialType','2');
 	    fnm = fullfile(resdir2,[animalID '_' sessionID '_Stg' stg '_TrialT2.jpg']);   % save
 	    saveas(G,fnm)
 	    close(G)
+        
+        StageNum = bynumbers_gamblingtask(animalID,sessionID,'s');
         
      case 3       
         % Lick raster TrialT1
         H = figure;
-	    viewlickTT({animalID sessionID},'TE',TE,'TriggerName','StimulusOn','SortEvent',...
+	    viewlickTT({animalID sessionID},'TE',TE_behaviour,'TriggerName','StimulusOn','SortEvent',...
             'TrialStart','eventtype','behav','ShowEvents',{{'StimulusOn'}},...
             'Partitions','#FirstLick','window',[-5 5],'LickSide','all','TrialType','1');
 	    fnm = fullfile(resdir2,[animalID '_' sessionID '_Stg' stg '_TrialT1.jpg']);   % save
@@ -164,12 +168,15 @@ if isbeh
         
         % Lick raster TrialT2
         G = figure;
-	    viewlickTT({animalID sessionID},'TE',TE,'TriggerName','StimulusOn','SortEvent',...
+	    viewlickTT({animalID sessionID},'TE',TE_behaviour,'TriggerName','StimulusOn','SortEvent',...
             'TrialStart','eventtype','behav','ShowEvents',{{'StimulusOn'}},...
             'Partitions','#FirstLick','window',[-5 5],'LickSide','all','TrialType','2');
 	    fnm = fullfile(resdir2,[animalID '_' sessionID '_Stg' stg '_TrialT2.jpg']);   % save
 	    saveas(G,fnm)
 	    close(G)
+        
+        StageNum = bynumbers_gamblingtask(animalID,sessionID,'s');
+        
     end   
 end
 

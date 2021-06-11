@@ -75,7 +75,7 @@ switch g.eventtype
             TE = g.TE;
         end
     case {'event','behav'}
-        datapath = fullfile(cbdir,animalID,sessionID,'TE.mat');
+        datapath = fullfile(cbdir,animalID,sessionID,'TE_behaviour.mat');
         if isempty(g.TE)
             TE = load(datapath);
         elseif ~isempty(g.TE)

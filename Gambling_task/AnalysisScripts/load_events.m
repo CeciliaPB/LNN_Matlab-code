@@ -1,4 +1,4 @@
-function [event, pulseon, pulseoff] = load_events(sessionpath)
+function [TTL, pulseon, pulseoff] = load_events(sessionpath)
 
 %   Creates a structure of events, each eventChannel in one variable.
 %   INPUTS:
@@ -67,16 +67,16 @@ for ii = find(ChannelID)
     end
     
     CHname = ['CH' num2str(ii)];
-    event.(CHname) = timestamps(CHdataON);
+    TTL.(CHname) = timestamps(CHdataON);
     pulseon.(CHname)  = timestamps(CHdataON); 
     pulseoff.(CHname) = timestamps(CHdataOFF);  %#ok<FNDSB>
 end
 
 % Save bpod TTLs
-fnm = fullfile(sessionpath,'event.mat');
-save(fnm,'event');
+fnm = fullfile(sessionpath,'TTLs.mat');
+save(fnm,'TTL');
 
 % Save PulsePal TTLs
-fnm = fullfile(sessionpath,'lightevent.mat');
+fnm = fullfile(sessionpath,'TTLOnOff.mat');
 save(fnm,'pulseon','pulseoff');
 end

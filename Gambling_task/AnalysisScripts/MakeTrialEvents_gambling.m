@@ -28,9 +28,9 @@ if ~isfolder(sessionpath)
     error('Session path is WRONG');
 end
 try
-    load([sessionpath '\' 'event.mat'],'event');   % load raw events
+    load([sessionpath '\' 'TTLs.mat'],'TTL');   % load raw events
 catch    
-    [event, ~, ~] = load_events(sessionpath);
+    [TTL, ~, ~] = load_events(sessionpath);
 end
 
 % % Choose the TTL ----------------------------------------------------------
@@ -57,17 +57,17 @@ end
 %         event = event.(list{8});
 % end
 
-% Events in CH8
-event = event.CH8;
+% Events in CH8 are the behaviour
+TTL = TTL.CH8;
 
 % Load Trial Events structure ---------------------------------------------
-SE_filename = [sessionpath filesep 'TE.mat'];
-TE = load(SE_filename);
+SE_filename = [sessionpath filesep 'TE_behaviour.mat'];
+TE_behaviour = load(SE_filename);
 
 % Synchronisation ---------------------------------------------------------
-TE2 = TE;
-son2 = event';   % stimulus onset time recorded by the recording system (OE)
-ts = TE.StimulusOn + TE.TrialStart;   % stimulus onset in absolut time recorded by the behavior control system
+TE2 = TE_behaviour;
+son2 = TTL';   % stimulus onset time recorded by the recording system (OE)
+ts = TE_behaviour.StimulusOn + TE_behaviour.TrialStart;   % stimulus onset in absolut time recorded by the behavior control system
 
 % Match timestamps - in case of mismatch, try to fix
 if ~ismatch(ts,son2)
@@ -109,7 +109,7 @@ TE2.TrialStart = son2 - sto;
 
 % Save synchronized 'TrialEvents' file
 if ~isempty(TE2.TrialStart)
-    save([sessionpath filesep 'TrialEvents.mat'],'-struct','TE2')
+    save([sessionpath filesep 'TE_recording.mat'],'-struct','TE2')
 else
     error('MakeTrialEvents:noOutput','Synchronization process failed.');
 end
