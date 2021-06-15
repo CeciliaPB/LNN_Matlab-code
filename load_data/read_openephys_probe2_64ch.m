@@ -1,4 +1,4 @@
-function read_openephys_probe2(varargin)
+function read_openephys_probe2_64ch(varargin)
 %READ_OPENEPHYS   Spike detection for open ephys data.
 %   READ_OPENEPHYS loads open ephys continuous files, subtracts the average
 %   of all channels (referencing), performs filtering, censoring and spike
