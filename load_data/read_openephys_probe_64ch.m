@@ -63,7 +63,7 @@ SaveFeatures = true;   % save MClust feature files
 % Common average reference
 switch g.reference
     case 'common_avg'
-        common_avg = common_avg_ref_probe(g.datadir,g.CHspec,[],g.rawdatafiletag,'processor', g.processor);
+        common_avg = common_avg_ref_probe_64ch(g.datadir,g.CHspec,[],g.rawdatafiletag,'processor', g.processor);
     case {'','none'}
         common_avg = 0;
     otherwise
