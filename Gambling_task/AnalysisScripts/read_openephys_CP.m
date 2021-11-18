@@ -50,7 +50,7 @@ if isequal(g.datadir(end),'\')
 end
 
 % Threshold
-Th = 40;
+Th = 35;
 
 % if isempty(g.resdir)
 %     if any(ismember(g.datadir,'-'))
@@ -114,9 +114,4 @@ end
 
 % Save PulsePal TTLs ------------------------------------------------------
 [event, pulseon, pulseoff] = load_events(g.datadir);
-fnm = fullfile(g.resdir,'event.mat');
-save(fnm,'event');
-
-fnm = fullfile(g.resdir,'lightevent.mat');
-save(fnm,'pulseon','pulseoff');
 end

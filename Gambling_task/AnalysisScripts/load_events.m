@@ -72,11 +72,13 @@ for ii = find(ChannelID)
     pulseoff.(CHname) = timestamps(CHdataOFF);  %#ok<FNDSB>
 end
 
+sessionpath2 = sessionpath(1:end-26);
+
 % Save bpod TTLs
-fnm = fullfile(sessionpath,'TTLs.mat');
+fnm = fullfile(sessionpath2,'TTLs.mat');
 save(fnm,'TTL');
 
 % Save PulsePal TTLs
-fnm = fullfile(sessionpath,'TTLOnOff.mat');
+fnm = fullfile(sessionpath2,'TTLOnOff.mat');
 save(fnm,'pulseon','pulseoff');
 end

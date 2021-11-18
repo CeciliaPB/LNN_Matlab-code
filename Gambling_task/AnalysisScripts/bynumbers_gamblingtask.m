@@ -93,19 +93,19 @@ switch (TE_behaviour.TrainingStage(1,1))
         % Calculate the percentage of correct first licks to each side.
         % Criterion for next stage: percentage > Correct100 in both sides.
         
-        Correct100 = 50;
+        Correct100 = 40;
         TrialType  = TE_behaviour.TrialType; % 1 = R/ LargeR; 2 = L/ LargeL
         FirstLick  = TE_behaviour.FirstLick; % 1 = R; 2 = L
+        Hit2 = sum(double(TrialType == 2 & TE_behaviour.Hit == 1));
+        Hit1 = sum(double(TrialType == 1 & TE_behaviour.Hit == 1));
         
         % Licks R
-        nTT1 = sum(double(TrialType == 1));
         RlickTT1 = sum(double(FirstLick == 1 & TrialType == 1));
-        CorrectR = RlickTT1/nTT1*100;
+        CorrectR = RlickTT1/Hit1*100;
         
         % Licks L
-        nTT2 = sum(double(TrialType == 2));
         LlickTT2 = sum(double(FirstLick == 2 & TrialType == 2));
-        CorrectL = LlickTT2/nTT2*100;
+        CorrectL = LlickTT2/Hit2*100;
         
         if CorrectR>Correct100 && CorrectL>Correct100
             NextStg = 1;
@@ -127,22 +127,24 @@ switch (TE_behaviour.TrainingStage(1,1))
         FirstLick  = TE_behaviour.FirstLick; % 1 = R; 2 = L
         nTT2 = sum(double(TrialType == 2));
         nTT1 = sum(double(TrialType == 1));
+        Hit2 = sum(double(TrialType == 2 & TE_behaviour.Hit == 1));
+        Hit1 = sum(double(TrialType == 1 & TE_behaviour.Hit == 1));
         
         % Licks R
         LlickTT1 = sum(double(SafeChoice == 1 & TrialType == 1));
         RlickTT1 = sum(double(RiskChoice == 1 & TrialType == 1));
         Rpunish  = sum(double(Punishment == 1));
         Rlick    = (sum(double(FirstLick == 1)) + Rpunish)/NumTrials*100;
-        Rrisk    = RlickTT1/nTT1*100;
-        Rsafe    = LlickTT1/nTT1*100;
+        Rrisk    = RlickTT1/Hit1*100;
+        Rsafe    = LlickTT1/Hit1*100;
         
         % Licks L
         LlickTT2 = sum(double(RiskChoice == 1 & TrialType == 2));
         RlickTT2 = sum(double(SafeChoice == 1 & TrialType == 2));
         Lpunish  = sum(double(Punishment == 2));
         Llick    = (sum(double(FirstLick == 2))+ Lpunish)/NumTrials*100;
-        Lsafe    = RlickTT2/nTT2*100;
-        Lrisk    = LlickTT2/nTT2*100;
+        Lsafe    = RlickTT2/Hit2*100;
+        Lrisk    = LlickTT2/Hit2*100;
         
         StageNumbers.Stage    = TE_behaviour.TrainingStage(1,1);
         StageNumbers.Rrisk100 = Rrisk;

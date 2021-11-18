@@ -27,4 +27,24 @@ for ii = 1:length(names)
         movefile(file, folder2);
     end
 end
+
+B = dir([AnimalID '_' file(end-18:end-15) '-' file(end-14:end-13)...
+    '-' file(end-12:end-11) '*']);
+names2 = {B.name}';
+B = cell2mat({B.isdir}');
+for kk = 1:length(names2)
+    for ii = 1:length(names)
+        file = names{ii,1};
+        folder = [file(20:end-11) 'a'];
+        folder2 = [file(20:end-11) 'b'];
+        if kk == 1 && B(kk) == 1 && exist('folder','var')
+            movefile(names2{kk,1}, folder);
+        elseif kk > 1 && B(kk) == 1 && exist('folder2','var')
+            movefile(names2{kk,1}, folder2);
+        else
+            disp('No recording found.');
+        end
+    end
+end
+
 end

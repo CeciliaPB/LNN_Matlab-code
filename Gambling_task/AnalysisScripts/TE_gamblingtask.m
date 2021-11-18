@@ -11,10 +11,10 @@ function TE_behaviour = TE_gamblingtask(filepath,ifsave)
 %   whether to save the results. Dafault 1, to save the results.
 %
 % OUTPUTS: 
-%   - TE: a structure containing all relevant data.
+%   - TE_behaviour: a structure containing all relevant data.
 % 
 % Examples: 
-% TRIALEVENTS_GAMBLINGTASK(SESSPATH,IFSAVE).
+% TE_GAMBLINGTASK(SESSPATH,IFSAVE).
 %
 % -------------------------------------------------------------------------
 % Based on solo2trialevent_auditory_cuedoutcome.m by Heguedus Panna.
@@ -195,9 +195,10 @@ for currentTrial = 1:ntrials
         TE_behaviour.Feedback(currentTrial) = 3; % Omission
     end
     
-    % Stimulis start & Delay 
+    % Stimulis start, end & Delay 
     if isfield(SessionData.RawEvents.Trial{1,currentTrial}.States,'StartStimulus')   
-        TE_behaviour.StimulusOn(1,currentTrial) = SessionData.RawEvents.Trial{1,currentTrial}.States.StartStimulus(1:1);
+        TE_behaviour.StimulusOn(1,currentTrial)  = SessionData.RawEvents.Trial{1,currentTrial}.States.StartStimulus(1:1);
+        TE_behaviour.StimulusOff(1,currentTrial) = SessionData.RawEvents.Trial{1,currentTrial}.States.StartStimulus(1:1) + SessionData.TrialSettings(1,currentTrial).SoundDuration;
         TE_behaviour.Delay(1,currentTrial) = SessionData.RawEvents.Trial{1, currentTrial}.States.Delay(1:1)-SessionData.RawEvents.Trial{1,currentTrial}.States.Delay(2);
     end
     

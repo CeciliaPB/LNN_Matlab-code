@@ -13,7 +13,7 @@ function lightpsth_2laser(sessionpath)
 % -------------------------------------------------------------------------
 
 % List of TT files
-dr = dir(sessionpath);
+dr = dir;
 files = {dr.name};
 TTpattern = getpref('cellbase','cell_pattern');   % find tetrode files with a cellbase-defined naming convention
 TTinx = regexp(files,[TTpattern '\d\.mat']);
@@ -21,7 +21,7 @@ TTinx = cellfun(@(s)~isempty(s),TTinx);
 TTfiles = files(TTinx);
 
 % Load photostimulation time stamps
-fnm = fullfile(sessionpath,'lightevent.mat');
+fnm = fullfile(sessionpath,'TTLOnOff.mat');
 if ~exist(fnm,'file')
     dr = dir('**/all_channels.events');
     [~, pulseon, ~] = load_events(dr.folder);   % convert PulsePal events
@@ -63,6 +63,7 @@ if      ~isstruct(pulseon)
     saveas(H,fnm)
     fnm = [sessionpath '\' 'light_psth.fig'];
     saveas(H,fnm)
+    pause(0.5)
     close(H)
     
 elseif isstruct(pulseon)
@@ -91,8 +92,9 @@ elseif isstruct(pulseon)
         H = figure;
         plot(lags,psth');
         legend(TTfiles);
-        fnm = [sessionpath '\' TTLname{nTTL,1} '_light_psth.jpg'];   % save
+        fnm = [TTLname{nTTL,1} '_light_psth.jpg'];   % save
         saveas(H,fnm)
+        pause(0.5)
         close(H)
     end
 end

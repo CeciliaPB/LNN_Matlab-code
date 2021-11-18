@@ -20,7 +20,7 @@ function viewcell2b_gambling(cellid,varargin)
 %           the trials according to different variables, multiple rasters 
 %           are plotted
 %       'EventMarkerWidth', specifies marker size for events shown
-%           'PlotZeroLine', 'on' or 'off', controls whether a line
+%       'PlotZeroLine', 'on' or 'off', controls whether a line
 %           indicating zero appears on the plots
 %
 %   For example calls, see QUICKANALISYS2.
@@ -50,7 +50,7 @@ default_args={...
     'FigureNum',            1;...
     'TriggerName',          'PulseOn';...
     'SortEvent',            'PulseOn';...
-    'eventtype',             'stim';... % 'behav'
+    'eventtype',            'stim';... % 'behav'
     'ShowEvents',           {{'PulseOn'}};...
     'ShowEventsColors',     {{[0 0.8 0] [0.8 0.8 0] [0 0.8 0.8]}};...
     'Num2Plot',             'all';...
@@ -72,6 +72,9 @@ if validcellid(cellid,{'list'}) ~= 1
     fprintf('%s is not valid.',cellid);
     return
 end
+if iscell(cellid)
+    cellid = cellid{1};
+end
 
 %--------------------------------------------------------------------------
 % Preprocessing
@@ -82,12 +85,13 @@ margin = g.sigma * 3;     % add an extra margin to the windows
 time = g.window(1)-margin:g.dt:g.window(2)+margin;   % time base array
 
 % Load events
+cellpath = 'L:\Cecilia\Behaviour\Risk assesment';
 switch g.eventtype
     case 'stim'
-        TE = loadcb(cellid,'StimEvents');
+        TE = load([cellpath '\' cellid(1:5) '\' cellid(7:15) '\' 'TE_StimEvent.mat']);
         SP = loadcb(cellid,'STIMSPIKES');
     case {'event','behav'}
-        TE = loadcb(cellid,'TrialEvents');
+        TE = load([cellpath '\' cellid(1:5) '\' cellid(7:15) '\' 'TE_recording.mat']);
         SP = loadcb(cellid,'EVENTSPIKES');
 end
 trigger_pos = findcellstr(SP.events(:,1),g.TriggerName);
@@ -201,19 +205,21 @@ end
 % Plot Raster + PSTH ------------------------------------------------------
 [mylabels, mycolors, mycolors2,mylinestyle] = makeColorsLabels(@defineLabelsColors_Cecilia,...
     TAGS);
-XLabel = ['Time - ' g.TriggerEvent];
+XLabel = ['Time (s) - ' g.TriggerEvent];
 YLabel = 'Rate (Hz)';
 
 % Plot the raster
-fhandle0 = plot_raster2a(stimes,time,valid_trials,COMPTRIALS,mylabels,EventTimes,...
-    window_margin,ev_windows,sort_var,g,'Colors',{mycolors},'Colors2',{mycolors2},...
-    'NumTrials2Plot',g.Num2Plot);
-if isfield(g,'Legend')
-    mylabels = g.Legend;
+if ~isempty(valid_trials)
+    fhandle0 = plot_raster2a(stimes,time,valid_trials,COMPTRIALS,mylabels,EventTimes,...
+        window_margin,ev_windows,sort_var,g,'Colors',{mycolors},'Colors2',{mycolors2},...
+        'NumTrials2Plot',g.Num2Plot);
+    if isfield(g,'Legend')
+        mylabels = g.Legend;
+    end
 end
 
 % Plot the PSTH
-if g.PSTHPlot == 1
+if g.PSTHPlot == 1 && ~isempty(valid_trials)
     if ~isempty(g.PlotDashedEvent)
         if nansum(TE.TrialStart) ~= 0   % i.e. TrialStart is an actual timestamp
             g.PlotDashedTime = eval(['TE.' g.PlotDashedEvent]);
@@ -241,8 +247,10 @@ if strcmpi(g.PrintCellID,'on')
 end
 
 % Link axes
-A = findobj(allchild(gcf),'Type','axes');
-Am = findobj(A,'YLim',[0 1]);
-linkaxes(setdiff(A,Am),'x');
+if ~isempty(valid_trials)
+    A = findobj(allchild(gcf),'Type','axes');
+    Am = findobj(A,'YLim',[0 1]);
+    linkaxes(setdiff(A,Am),'x');
+end
 
 end

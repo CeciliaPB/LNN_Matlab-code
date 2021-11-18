@@ -1,4 +1,4 @@
-function [events,epochs] = defineEventsEpochs_gambling
+function [events,epochs] = defineEventsEpochs_gambling(varargin)
 %DEFINEEVENTSEPOCHS_GAMBLING   Define events and epochs for spike extraction.
 %   [EVENTS,EPOCHS] = DEFINEEVENTSEPOCHS_GAMBLING defines events and epochs
 %   for spike extraction. 
@@ -29,22 +29,65 @@ function [events,epochs] = defineEventsEpochs_gambling
 %   Based on DEFINEEVENTSEPOCHS_DEFAULT by Balazs Hangya. Edit log: BH 5/2/14
 % -------------------------------------------------------------------------
 
-% Define events and epochs
-%              EventLabel           EventTrigger1        EventTrigger2        Window
-i = 1;
-events(i,:) = {'StimulusOn',        'StimulusOn',        'StimulusOn',        [-6 6]};    i = i + 1;
-events(i,:) = {'StimulusOff',       'StimulusOff',       'StimulusOff',       [-6 6]};    i = i + 1;
-events(i,:) = {'DeliverFeedback',   'DeliverFeedback',   'DeliverFeedback',   [-6 6]};    i = i + 1;
-events(i,:) = {'DeliverAllFeedback','DeliverAllFeedback','DeliverAllFeedback',[-6 6]};    i = i + 1;
-events(i,:) = {'LickLIn',           'LickLIn',            'LickLIn',          [-6 6]};    i = i + 1;
-events(i,:) = {'LickLOut',          'LickLOut',           'LickLOut',         [-6 6]};    i = i + 1;
-events(i,:) = {'LickRIn',           'LickRIn',            'LickRIn',          [-6 6]};    i = i + 1;
-events(i,:) = {'LickROut',          'LickROut',           'LickROut',         [-6 6]};    i = i + 1;
+eventtype = 'behav';
+if nargin == 1
+    eventtype = varargin{1};
+end
 
-% Variable events
-% events(i,:) = {'StimulusSampling','StimulusOn',    'StimulusOff',     [-6 6]};    i = i + 1;
+switch  eventtype
+    case {'behav','event'}
+        % Define events and epochs
+        %              EventLabel           EventTrigger1        EventTrigger2        Window
+        ii = 1;
+        events(ii,:) = {'StimulusOn',        'StimulusOn',        'StimulusOn',        [-6 6]};    ii = ii + 1;
+        events(ii,:) = {'StimulusOff',       'StimulusOff',       'StimulusOff',       [-6 6]};    ii = ii + 1;
+        events(ii,:) = {'DeliverFeedback',   'DeliverFeedback',   'DeliverFeedback',   [-6 6]};    ii = ii + 1;
+        events(ii,:) = {'DeliverAllFeedback','DeliverAllFeedback','DeliverAllFeedback',[-6 6]};    ii = ii + 1;
+        events(ii,:) = {'LickLIn',           'LickLIn',            'LickLIn',          [-6 6]};    ii = ii + 1;
+        events(ii,:) = {'LickLOut',          'LickLOut',           'LickLOut',         [-6 6]};    ii = ii + 1;
+        events(ii,:) = {'LickRIn',           'LickRIn',            'LickRIn',          [-6 6]};    ii = ii + 1;
+        events(ii,:) = {'LickROut',          'LickROut',           'LickROut',         [-6 6]};
 
-% Define epochs for rate calculations
-%               EpochLabel      ReferenceEvent      FixedWindow       RealWindow
-i = 1;
-epochs(i,:) = {'StimulusOn',    'StimulusOn',       [0.0 0.3],        'StimulusSampling'};    i = i + 1;
+        % Variable events
+        % events(i,:) = {'StimulusSampling','StimulusOn',    'StimulusOff',     [-6 6]};    i = i + 1;
+
+        % Define epochs for rate calculations
+        %               EpochLabel      ReferenceEvent      FixedWindow       RealWindow
+        kk = 1;
+        epochs(kk,:) = {'StimulusOn',    'StimulusOn',       [0.0 0.3],        'StimulusSampling'};
+    
+    case 'stim'
+        %              EventLabel       EventTrigger1    EventTrigger2  Window
+        ii = 1;
+        events(ii,:) = {'BurstOn',       'BurstOn',      'BurstOn',      [-6 6]};   ii = ii + 1;
+        events(ii,:) = {'PulseOn',       'PulseOn',      'PulseOn',      [-3 3]};   ii = ii + 1;
+        events(ii,:) = {'PreBurstIBI',   'PrevBurstOff', 'BurstOn',      [0 0]};    ii = ii + 1;
+        events(ii,:) = {'BurstPeriod',   'BurstOn',      'BurstOff',     [0 0]};    ii = ii + 1;
+        events(ii,:) = {'NextBurstIBI',  'BurstOff',     'NextBurstOn',  [0 0]};    ii = ii + 1;
+
+        % Variable events
+        events(ii,:) = {'PreBurstIBI2',  'PrevBurstOff', 'BurstOn',      [-1 0]};   ii = ii + 1;
+        events(ii,:) = {'BurstPeriod2',  'BurstOn',      'BurstOff',     [-1 0]};   ii = ii + 1;
+        events(ii,:) = {'NextBurstIBI2', 'BurstOff',     'NextBurstOn',  [-1 0]};   ii = ii + 1;
+        % events(i,:) = {'OmitPulse',     'OmitPulse',    'OmitPulse',    [-6 6]};   i = i + 1;
+        events(ii,:) = {'ZeroPulse',     'ZeroPulse',    'ZeroPulse',    [-6 6]};
+
+        % Define epochs for rate calculations
+        %               EpochLabel             ReferenceEvent  FixedWindow          RealWindow
+        kk = 1;
+        epochs(kk,:) = {'FixedBaseline5',       'BurstOn',      [-0.005 0.0],  'PreBurstIBI'};   kk = kk + 1;
+        epochs(kk,:) = {'FixedLightResponse5',  'BurstOn',      [0.0 0.005],   'BurstPeriod'};   kk = kk + 1;
+        epochs(kk,:) = {'FixedBaseline5a',      'BurstOn',      [-0.005 0.0],  'BurstOn'};       kk = kk + 1;
+        epochs(kk,:) = {'FixedLightResponse5a', 'BurstOn',      [0.0 0.005],   'BurstOn'};       kk = kk + 1;
+        epochs(kk,:) = {'FixedBaseline10',      'BurstOn',      [-0.01 0.0],   'PreBurstIBI'};   kk = kk + 1;
+        epochs(kk,:) = {'FixedLightResponse10', 'BurstOn',      [0.0 0.01],    'BurstPeriod'};   kk = kk + 1;
+        epochs(kk,:) = {'FixedBaseline20',      'BurstOn',      [-0.02 0.0],   'PreBurstIBI'};   kk = kk + 1;
+        epochs(kk,:) = {'FixedLightResponse20', 'BurstOn',      [0.0 0.02],    'BurstPeriod'};   kk = kk + 1;
+        epochs(kk,:) = {'FixedBaseline40',      'BurstOn',      [-0.04 0.0],   'PreBurstIBI'};   kk = kk + 1;
+        epochs(kk,:) = {'FixedLightResponse40', 'BurstOn',      [0.0 0.04],    'BurstPeriod'};   kk = kk + 1;
+        epochs(kk,:) = {'BurstBaseline',        'PreBurstIBI',  [NaN NaN],     'NaN'};           kk = kk + 1;
+        epochs(kk,:) = {'BurstResponse',        'BurstPeriod',  [NaN NaN],     'NaN'};
+
+end
+
+end
