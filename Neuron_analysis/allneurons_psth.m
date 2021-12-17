@@ -46,7 +46,6 @@ s = 0; % Default NOT save figs
 name = ['psth',num2str(floor(post/fs)),'s']; % Name of Valiable to be saved
 figname = '';
 
-
 % Params introduced in the varargin ---------------------------------------
 if nargin
     for ii = 1:length(varargin)
@@ -87,13 +86,13 @@ if nargin
 end
 
 % Define pre and post times
-if isempty(pre) == 1 | isempty(post) == 1
+if isempty(pre) == 1 || isempty(post) == 1
     error('Please define pre and post times (in seconds). Please see examples.');  
 end
 
 
 for nn = ngroup
-tmp = dir(['*R',num2str(nn),'_','*.mat']); % all .mat that belong to the group
+tmp = dir(['*',num2str(nn),'_','*.mat']); % all .mat that belong to the group
 files = {tmp.name}'; 
 
 % This reorders the files so after 1 comes 2 and not 10. Thank you MATLAB.

@@ -50,14 +50,14 @@ if nargin
                 Dt = varargin{ii+1};
             case 'pre'
                 pre = varargin{ii+1};
-                if pre >= 5000
-                elseif pre < 5000
+                if pre >= 3000
+                elseif pre < 3000
                     pre = pre * fs;
                 end
             case 'post'
                 post = varargin{ii+1};
-                if post >= 5000
-                elseif post < 5000
+                if post >= 3000
+                elseif post < 3000
                     post = post * fs;
                 end
             case 'bin'
@@ -71,7 +71,7 @@ if nargin
     end
 end
 for nn = ngroup
-tmp = dir(['GR',num2str(nn),'_','*.mat']); % all .mat that belong to the group
+tmp = dir(['T*',num2str(nn),'_','*.mat']); % all .mat that belong to the group
 files = {tmp.name}'; 
 % This reorders the files so after 1 comes 2 and not 10. Thank you MATLAB.
 if length(files)>9

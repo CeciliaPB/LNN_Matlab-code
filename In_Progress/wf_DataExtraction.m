@@ -18,7 +18,7 @@ plot([0 0],[0 600],'r','Linewidth',2)
 
 %% Extract data from wf
 
-Tab    = Lick;
+Tab    = WN;
 try
     folder = Tab.folder;
 catch
@@ -26,7 +26,7 @@ catch
 end
 Data   = table;
 
-for kk = 1:size(Tab.folder,1)
+for kk = 1:size(folder,1)
     
     % Go to folder and load shock TTL
     cd(folder(kk,:));
@@ -47,9 +47,9 @@ for kk = 1:size(Tab.folder,1)
         GroupID = E{1};
         load(GroupID,'TimeStamps','WaveForms');
         
-        wf = waveform_analysis(GroupID,NeuronID,'features');
+        wf = waveform_analysis(NeuronID,'features','NoType');
         
-        save(NeuronID,'wf','-append');
+%         save(NeuronID,'wf','-append');
 %     end
     
     % load the variables inside wf
@@ -58,27 +58,50 @@ for kk = 1:size(Tab.folder,1)
         eval([names{ii} '=wf.' names{ii} ]);
     end
     
-    if pk1(1,2)>pk2(1,2) % In case there are no two valleys
-        b   = a;
-        a   = 0;
-        pk3 = pk1;
-        pk1 = [0,0];
-        d   = abs(c);
-        c   = NaN;
-        f   = e;
-        e   = NaN;
+    if pk1(1,2)>pk2(1,2) % % In case there are no two valleys
+        b     = a;      
+        a     = 0;
+        pk3   = pk1;    
+        pk1   = [0,0];  
+        d     = abs(c); 
+        c     = NaN;
+        f     = e;      
+        e     = NaN;
+        first = NaN;
+    elseif isempty(nonzeros(pk1)) == 1
+        c     = NaN;
+        e     = NaN;
+        first = NaN;
+    elseif isempty(nonzeros(pk3)) == 1 % % In case there are no two valleys
+        b     = a;      
+        a     = 0;
+        pk3   = pk2;    
+        pk2   = pk1;    
+        pk1   = [0,0];  
+        d     = c;      
+        c     = NaN;
+        f     = e;      
+        e     = NaN;
         first = NaN;
     end    
     
     % Calculations
-    sym     = a/(a+b);
-    amp1    = abs(e); % pk2-pk1
-    amp2    = abs(f); % pk3-pk2
-    pkdist1 = (15 * 0.5 )/c; % in ms, distance pk1 to pk2
-    pkdist2 = (15 * 0.5 )/d; % in ms, distance pk2 to pk3
-    halfwidth = (15 * 0.5 )/g; % in ms, halfwith pk2
-    pkwidth1  = (15 * 0.5 )/first; % in ms, width pk1
-    pkwidth2  = (15 * 0.5 )/last; % in ms, width pk3
+    sym  = abs(a)/(abs(a)+abs(b));
+    amp1 = abs(e); % pk2-pk1
+    amp2 = abs(f); % pk3-pk2
+    if abs(c) > 1
+        pkdist1 = (15 * 0.5 )/c; % in ms, distance pk1 to pk2
+        pkdist2 = (15 * 0.5 )/d; % in ms, distance pk2 to pk3
+        halfwidth = (15 * 0.5 )/g; % in ms, halfwith pk2
+        pkwidth1  = abs((15 * 0.5 )/first); % in ms, width pk1
+        pkwidth2  = abs((15 * 0.5 )/last); % in ms, width pk3
+    else
+        pkdist1 = c*1000; % in ms, distance pk1 to pk2
+        pkdist2 = d*1000; % in ms, distance pk2 to pk3
+        halfwidth = g*1000; % in ms, halfwith pk2
+        pkwidth1  = abs(first*1000); % in ms, width pk1
+        pkwidth2  = abs(last*1000); % in ms, width pk3
+    end
     
     Data.neuron(kk,:) = ([folder(kk,13:end), '_',NeuronID(1,end-8:end-4)]);
     Data.sym(kk)      = sym;
@@ -96,7 +119,7 @@ end
 %% Statistical analysis
 % amp2
 
-Var = 'dist';
+Var = 'pkdist2';
 KWData = nan(29,6);
 KWData(1:length(ExplorationData.(Var)),1) = [ExplorationData.(Var)];
 KWData(1:length(RestData.(Var)),2)        = [RestData.(Var)];
@@ -113,7 +136,7 @@ KWData(1:length(PTData.(Var)),6)          = [PTData.(Var)];
 % % Homoscedasticity p < 0.05, not same variance; p > 0.05, same variance.
 % pvar = vartestn(KWData(:,[1:3,5:6]));
 
-[p,tbl,stats] = kruskalwallis(KWData(:,5:6));
+[p,tbl,stats] = kruskalwallis(KWData(:,[1:3,5:6]));
 % c = multcompare(stats);
 % [p,tbl,stats] = kruskalwallis((KWData(:,[1:3,5:6])).^2);
 % c = multcompare(stats);
@@ -132,16 +155,29 @@ y(:,3) = 2.9 + (3.1-2.9).*rand(length(PlotData),1);
 y(:,4) = 3.9 + (4.1-3.9).*rand(length(PlotData),1);
 y(:,5) = 4.9 + (5.1-4.9).*rand(length(PlotData),1);
 y(:,6) = 5.9 + (6.1-5.9).*rand(length(PlotData),1);
-Color = 1/255*[0, 153, 204];
-SKscat = 1/255*[102,102,102];
-hold on; boxplot(PlotData,'symbol','','Color',Color,'Labels',{'Exploring','Resting','Grooming','Licking','White Noise','Pure Tone'},'Widths',0.5)
+EColor  = 1/255*[0, 102, 255];
+RColor  = 1/255*[204, 0, 204];
+GColor  = 1/255*[0, 153, 0];
+LColor  = 1/255*[255, 102, 0];
+WNColor = 1/255*[0, 51, 204];
+PTColor = 1/255*[0, 153, 204];
+SKscat  = 1/255*[102,102,102];
+hold on; 
+Color = [ EColor; RColor; GColor; LColor; WNColor; PTColor];
+boxplot(PlotData,'symbol','','Labels',...
+    {'Exploring','Resting','Grooming','Licking','White Noise','Pure Tone'},...
+    'Widths',0.5,'Color',Color)
 h = findobj(gca,'Tag','Box');
-% uistack(patch(get(h,'XData'),get(h,'YData'),Color,'FaceAlpha',.5,'EdgeColor',Color,'LineWidth',2),'bottom');
+Color = [PTColor; WNColor; LColor; GColor; RColor; EColor];
+for jj=1:length(h)
+    uistack(patch(get(h(jj),'XData'),get(h(jj),'YData'),Color(jj,:),...
+        'FaceAlpha',.5,'EdgeColor',Color(jj,:),'LineWidth',2),'bottom');
+end
 set(findobj(gcf,'-regexp','Tag','\w*Whisker'),'LineStyle','-','LineWidth',2)
 set(findobj(gcf,'-regexp','Tag','\w*Adjacent'),'LineWidth',2)
 set(findobj(gcf,'-regexp','Tag','Median'),'LineWidth',3,'Color','r');
 plot(y,PlotData,'o','MarkerFaceColor',SKscat,'MarkerEdgeColor',SKscat,'LineWidth',1)
-ylim([-0.1 1]);
+% ylim([-0.1 1]);
 ylabel('Time (ms)');
 set(gca,'fontname','arial');
 

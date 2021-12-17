@@ -670,16 +670,16 @@ end
 
 %% STEP 6: Statistical analysis
 
-DataT = PrL1_lick.lick_all*100;
-DataC = PrL2_lick.lick_all*100;
-name = 'PrL_lick_all';
+DataT = TelC.INall;
+DataC = Control.INall;
+name = 'pStr_report_INall';
 kk = 7; % Set to 3 for session, to 9 for day analysis
 
 p_val = zeros(5,1);
 C_dat = zeros(5,2);
 T_dat = zeros(5,2);
 
-for ii = 1:kk:length(DataC)
+for ii = 1:kk:70
     
 mT = nanmean(DataT(ii:ii+(kk-1),:),2);
 mC = nanmean(DataC(ii:ii+(kk-1),:),2);
@@ -694,7 +694,7 @@ C_dat(n,2) = nanstd(mC);
 
 end
 
-pval = double(p_val<=0.07)*120;
+pval = double(p_val<=0.05)*120;
 pval(pval == 0)= NaN;
 errorbar(T_dat(:,1),T_dat(:,2),'-o','LineWidth',2,'MarkerFaceColor','auto');
 xlim([0 length(T_dat(:,1))+1]);
@@ -704,7 +704,7 @@ plot(pval,'k*');
 pval = double(p_val<=0.05)*120;
 pval(pval == 0)= NaN;
 plot(pval(:,1),'k*');
-legend('PrL1','PrL2','p-val < 0.07','p-val < 0.05','Location', 'southeast');
+legend('TelC','Control','p-val < 0.05','Location', 'southeast');
 ylim([-15 130]);
 yticks([0 50 100])
 xlabel('Session #');
@@ -881,11 +881,11 @@ eval([totaltab '= [tab];']);
 
 %% Statistical analysis 3bins
 % # Session: 1 = (1:7), 2 = (8:15)...
-S = 10;
+S = 7;
 b = S*7;
 a = S*7 - 6;
-DataT = PrL1_3sbins;
-DataC = PrL2_3sbins;
+DataT = TelC_3sbins;
+DataC = Ctrl_3sbins;
 
 Data_TelC(1:7,1) =  nanmean(DataT.Bin0(a:b,:),2);
 Data_TelC(1:7,2) =  nanmean(DataT.Bin1(a:b,:),2);
@@ -909,12 +909,12 @@ for ii = 1:8
     p_val(ii) = p;
 end
 
-pval = double(p_val<=0.07)*120;
+pval = double(p_val<=0.05)*120;
 pval(pval == 0)= NaN;
 errorbar(nanmean(Data_TelC,1),nanstd(Data_TelC,1),'-o','LineWidth',2,'MarkerFaceColor','auto');
 hold on;
 errorbar(nanmean(Data_Ctrl,1),nanstd(Data_Ctrl,1),'-o','LineWidth',2,'MarkerFaceColor','auto');
-plot(pval,'r*');
+plot(pval,'k*');
 pval = double(p_val<=0.05)*120;
 pval(pval == 0)= NaN;
 plot(pval,'k*');
@@ -924,14 +924,14 @@ xticklabels([-3 0 3 6 9 12 15 18]);
 ylim([0 130]);
 xlim([0 9]);
 title(['Mean time IN platform - S',num2str(S,'%02.0f')]);
-lgd = legend('PrL1','PrL2','pval < 0.07','pval < 0.05','Location', 'southeast');
+lgd = legend('TelC','Control','pval < 0.05','Location', 'southeast');
 lgd.AutoUpdate = 'off';
 plot([2 8],[125 125],'Color',[0.6 0.6 0.6],'LineWidth',10);
 text(4.5,125.2,'TONE','FontWeight','bold','Color','k');
 set(gca,'fontname','arial');
 hold off;
 
-saveas(gcf,['TimeINPlat_3sbins_S',num2str(S,'%02.0f')],'png')
+saveas(gcf,['Report_TimeINPlat_3sbins_S',num2str(S,'%02.0f')],'png')
 
 %% Other plots
 plot(Control_3.tone,'-o','LineWidth',2,'MarkerFaceColor','auto');

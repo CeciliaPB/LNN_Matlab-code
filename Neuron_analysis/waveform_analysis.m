@@ -37,7 +37,7 @@ function wf = waveform_analysis(neuron,varargin)
 % MATLAB toolboxes: Signal Processing Toolbox.
 % -------------------------------------------------------------------------
 
-clearvars -except varargin 
+clearvars -except neuron varargin 
 
 % Defining params ---------------------------------------------------------
 if ~isempty(varargin) && max(strcmp(varargin, 's')) == 1
@@ -45,6 +45,9 @@ if ~isempty(varargin) && max(strcmp(varargin, 's')) == 1
     type = 'jpg';
 else
     s = 0;
+end
+if max(strcmp(varargin, 'NoType'))
+    TypeID = 0;
 end
 group = neuron(1:end-6);
 
@@ -85,16 +88,19 @@ mUP = mean(allUP); % Mean wf
 mDOWN = -mUP; % Inverted values
 
 % Select the type of neuron -----------------------------------------------
-neuronType = imread('L:\Cecilia\WFparams_Types.tif');
-figure('name','WaveformType','Position',[100 200 [838, 600]]);
-subplot(2,1,1);
-plot(time,values,'b','LineWidth',2,'Color',[0.8500 0.3250 0.0980]);
-title('Your waveform');
-subplot(2,1,2,'Position',[.0 -.25 [1, 1]]);
-imshow(neuronType);
-disp('Please select the waveform type,');
-TypeID = input('[1/ 2]:');
-close WaveformType
+if TypeID == 0
+else
+    neuronType = imread('L:\Cecilia\WFparams_Types.tif');
+    figure('name','WaveformType','Position',[100 200 [838, 600]]);
+    subplot(2,1,1);
+    plot(time,mUP,'b','LineWidth',2,'Color',[0.8500 0.3250 0.0980]);
+    title('Your waveform');
+    subplot(2,1,2,'Position',[.0 -.25 [1, 1]]);
+    imshow(neuronType);
+    disp('Please select the waveform type,');
+    TypeID = input('[1/ 2]:');
+    close WaveformType
+end
 
 % Calculate features using the mean waveform, depends on waveform type ----
 if max(strcmp(varargin, 'features')) == 1 && max(strcmp(varargin, 'plot') == 1)
@@ -132,6 +138,10 @@ if max(strcmp(varargin, 'features')) == 1 && max(strcmp(varargin, 'plot') == 1)
     loc = zeros(1,2); % loc or l refer to the time
     pr  = zeros(2,2); % pr or r refer to the halfwidth
     switch TypeID
+        case 0
+            [pk2(1,1),pk2(2,1),w2,~] = findpeaks(mUP,time,'SortStr',...
+                'descend','NPeaks',1);
+            [p,l,~,r] = findpeaks(mDOWN,time,'MinPeakHeight',0.01);
         case 1
             [pk2(1,1),pk2(2,1),w2,~] = findpeaks(mUP,time,'SortStr',...
                 'descend','NPeaks',1);
@@ -196,6 +206,21 @@ if max(strcmp(varargin, 'features')) == 1 && max(strcmp(varargin, 'plot') == 1)
     wf.f = abs(wf.pk3(1,1)) + abs(wf.pk2(1,1));
     wf.g = w2;
     switch TypeID
+        case 0
+            F  = mDOWN>0;
+            F2 = (time > wf.pk2(2));
+            F3 = ischange(double(F & transpose(F2)),'linear');
+            F4 = time(find(F3,2,'first'));
+            I(1,2) = F4(2);
+            F  = mDOWN>0;
+            F2 = (time < wf.pk2(2));
+            F3 = ischange(double(F & transpose(F2)),'variance');
+            if max(F3) ~= 1
+                F4 = 0;
+            else
+                F4 = time(find(F3,2,'last'));
+            end
+            I(1,1) = F4(1);
         case 1
             F  = mDOWN>0;
             F2 = (time > wf.pk2(2));
@@ -263,6 +288,10 @@ elseif max(strcmp(varargin, 'features')) == 1
     loc = zeros(1,2); % loc or l refer to the time
     pr  = zeros(2,2); % pr or r refer to the halfwidth
     switch TypeID
+        case 0
+            [pk2(1,1),pk2(2,1),w2,~] = findpeaks(mUP,time,'SortStr',...
+                'descend','NPeaks',1);
+            [p,l,~,r] = findpeaks(mDOWN,time,'MinPeakHeight',0.01);
         case 1
             [pk2(1,1),pk2(2,1),w2,~] = findpeaks(mUP,time,'SortStr',...
                 'descend','NPeaks',1);
@@ -327,6 +356,25 @@ elseif max(strcmp(varargin, 'features')) == 1
     wf.f = abs(wf.pk3(1,1)) + abs(wf.pk2(1,1));
     wf.g = w2;
     switch TypeID
+        case 0
+            F  = mDOWN>0;
+            F2 = (time > wf.pk2(2));
+            F3 = ischange(double(F & F2),'linear');
+            F4 = time(find(F3,2,'first'));
+            try 
+                I(1,2) = F4(2);
+            catch
+                I(1,2) = 0;
+            end
+            F  = mDOWN>0;
+            F2 = (time < wf.pk2(2));
+            F3 = ischange(double(F & F2),'variance');
+            if max(F3) ~= 1
+                F4 = 0;
+            else
+                F4 = time(find(F3,2,'last'));
+            end
+            I(1,1) = F4(1);
         case 1
             F  = mDOWN>0;
             F2 = (time > wf.pk2(2));
@@ -377,7 +425,7 @@ if s == 1
 elseif s ~= 1
 end    
 
-if max(strcmp(varargin, 'features')) == 1 % Save structure if features calculated
+if s == 1 && max(strcmp(varargin, 'features')) == 1 % Save structure if features calculated
     disp(['Save in ' neuron '?']);
     saveID = input('[Y/ N]:','s');
     switch saveID

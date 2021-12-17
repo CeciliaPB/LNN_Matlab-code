@@ -16,14 +16,12 @@ function [rastmat, timevec] = psth_raster(trialspx,pre,post,varargin)
 % - timevec: peri-stimulus time histogram up to the first after the trigger
 % 
 % Examples 
-% [rastmat,timevec] = mraster(trialspx,1000,1000,'chart')
+% [rastmat,timevec] = psth_raster(trialspx,1000,1000,'chart')
 %
 % -------------------------------------------------------------------------
 % Cecília Pardo-Bellver, 2019
 % Laboratory of Network Neurophysiology
 % Institute of Experimental Medicine, Hungary.
-%
-% Based on mraster by Maik C. Stttgen, Feb 2011
 % -------------------------------------------------------------------------
 
 % Read varargin
