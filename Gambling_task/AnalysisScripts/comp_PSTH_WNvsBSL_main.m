@@ -10,7 +10,11 @@ function comp_PSTH_WNvsBSL_main(resdir,varargin)
 %    - resdir, where to save plots and graphs
 %    - varargin, See Default arguments.
 % It can be used with or without CellBase, default NO.
-%
+% 
+% Example:
+% comp_PSTH_WNvsBSL_main(cd,'CellList','Table.xls','TTL','TTLs.mat','issave',1,'sig_thr',0.07);
+% comp_PSTH_WNvsBSL_main(cd,'CellBase','true','PoI',{'Sound'},'AnimalID','BAd07','issave',1);
+% 
 % See also comp_PSTH_WNvsBSL_statszero, comp_PSTH_WNvsBSL_stats and
 % comp_PSTH_WNvsBSL_stats_CB.
 % -------------------------------------------------------------------------
