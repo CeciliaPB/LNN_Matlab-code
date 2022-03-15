@@ -25,6 +25,8 @@ fnm = fullfile(sessionpath,'TTLOnOff.mat');
 if ~exist(fnm,'file')
     dr = dir('**/all_channels.events');
     [~, pulseon, ~] = load_events(dr.folder);   % convert PulsePal events
+else
+    dr = dir('**/all_channels.events');
 end
 if ~exist('pulseon','var')
     load(fnm,'pulseon');

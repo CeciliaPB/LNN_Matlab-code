@@ -23,7 +23,7 @@ function quickanalysis_gamblingtask(animalNO,sessionID,sessionspec)
 bigfig    = 0; % Make figure all screen
 figformat = '.jpg'; % Change image file format
 breath    = 0.01; % Pause time to visualise images
-reTE      = 1; % Remake the TE files
+reTE      = 0; % Remake the TE files
 % Input arguments ---------------------------------------------------------
 narginchk(0,4)
 
@@ -104,31 +104,35 @@ end
 
 % Behavior ----------------------------------------------------------------
 if isbeh
+    StageNum = bynumbers_gamblingtask(animalID,sessionID,'s');
     stg = num2str(TE_behaviour.TrainingStage(1,1));
     switch (TE_behaviour.TrainingStage(1,1))	
      case 1
         % Lick raster 
 	    H = figure;
         TE_behaviour.StimulusOn = zeros(1,length(TE_behaviour.TrainingStage));
-        viewlickRL({animalID sessionID},'TE',TE_behaviour,'TriggerName','StimulusOn','SortEvent',...
-            'TrialStart','eventtype','behav','ShowEvents',{{'StimulusOn'}},...
-            'Partitions','#TrialType','window',[-5 5],'LickSide','all');
-	    fnm = fullfile(resdir2,[animalID '_' sessionID '_Stg' stg '_Licks' figformat]);   % save
+        viewlickRL({animalID sessionID},'TE',TE_behaviour,'TriggerName',...
+            'StimulusOn','SortEvent','TrialStart','eventtype','behav',...
+            'ShowEvents',{{'StimulusOn'}},'Partitions','#TrialType',...
+            'window',[-5 5],'LickSide','all');
+	    fnm = fullfile(resdir2,[animalID '_' sessionID '_Stg' stg '_Licks' figformat]); 
         saveas(H,fnm)
         if bigfig == 1
             maximize_figure(H)
         end
         close(H)
         
-        StageNum = bynumbers_gamblingtask(animalID,sessionID,'s');
-        
+        disp(['Current stage: Stg ' stg]);
+        disp(['Advance new stage?[Y = 1, N = 0]: ' num2str(StageNum.NextStg)]);
+    
      case 2
         % Lick raster all licks, pertition trial
 	    H = figure;
-	    viewlickRL({animalID sessionID},'TE',TE_behaviour,'TriggerName','StimulusOn','SortEvent',...
-            'TrialStart','eventtype','behav','ShowEvents',{{'StimulusOn'}},...
-            'Partitions','#TrialType','window',[-5 5],'LickSide','all');
-        fnm = fullfile(resdir2,[animalID '_' sessionID '_Stg' stg '_Licks' figformat]);   % save
+	    viewlickRL({animalID sessionID},'TE',TE_behaviour,'TriggerName',...
+            'StimulusOn','SortEvent','TrialStart','eventtype','behav',...
+            'ShowEvents',{{'StimulusOn'}},'Partitions','#TrialType',...
+            'window',[-5 5],'LickSide','all');
+        fnm = fullfile(resdir2,[animalID '_' sessionID '_Stg' stg '_Licks' figformat]);
         saveas(H,fnm)
         if bigfig == 1
             maximize_figure(H)
@@ -137,10 +141,11 @@ if isbeh
       
         % Lick raster R
 	    H = figure;
-	    viewlickRL({animalID sessionID},'TE',TE_behaviour,'TriggerName','StimulusOn','SortEvent',...
-            'TrialStart','eventtype','behav','ShowEvents',{{'StimulusOn'}},...
-            'Partitions','#TrialType','window',[-5 5],'LickSide','R');
-	    fnm = fullfile(resdir2,[animalID '_' sessionID '_Stg' stg '_LicksR' figformat]);   % save
+	    viewlickRL({animalID sessionID},'TE',TE_behaviour,'TriggerName',...
+            'StimulusOn','SortEvent','TrialStart','eventtype','behav',...
+            'ShowEvents',{{'StimulusOn'}},'Partitions','#TrialType',...
+            'window',[-5 5],'LickSide','R');
+	    fnm = fullfile(resdir2,[animalID '_' sessionID '_Stg' stg '_LicksR' figformat]);
         saveas(H,fnm)
         if bigfig == 1
             maximize_figure(H)
@@ -149,10 +154,11 @@ if isbeh
     
         % Lick raster L
 	    H = figure;
-	    viewlickRL({animalID sessionID},'TE',TE_behaviour,'TriggerName','StimulusOn','SortEvent',...
-            'TrialStart','eventtype','behav','ShowEvents',{{'StimulusOn'}},...
-            'Partitions','#TrialType','window',[-5 5],'LickSide','L');
-        fnm = fullfile(resdir2,[animalID '_' sessionID '_Stg' stg '_LicksL' figformat]);   % save
+	    viewlickRL({animalID sessionID},'TE',TE_behaviour,'TriggerName',...
+            'StimulusOn','SortEvent','TrialStart','eventtype','behav',...
+            'ShowEvents',{{'StimulusOn'}},'Partitions','#TrialType',...
+            'window',[-5 5],'LickSide','L');
+        fnm = fullfile(resdir2,[animalID '_' sessionID '_Stg' stg '_LicksL' figformat]);
         saveas(H,fnm)
         if bigfig == 1
             maximize_figure(H)
@@ -161,10 +167,11 @@ if isbeh
         
         % Lick raster TrialT1
         H = figure;
-	    viewlickTT({animalID sessionID},'TE',TE_behaviour,'TriggerName','StimulusOn','SortEvent',...
-            'TrialStart','eventtype','behav','ShowEvents',{{'StimulusOn'}},...
-            'Partitions','#FirstLick','window',[-5 5],'LickSide','all','TrialType','1');
-        fnm = fullfile(resdir2,[animalID '_' sessionID '_Stg' stg '_TrialT1' figformat]);   % save
+	    viewlickTT({animalID sessionID},'TE',TE_behaviour,'TriggerName',...
+            'StimulusOn','SortEvent','TrialStart','eventtype','behav',...
+            'ShowEvents',{{'StimulusOn'}},'Partitions','#FirstLick',...
+            'window',[-5 5],'LickSide','all','TrialType','1');
+        fnm = fullfile(resdir2,[animalID '_' sessionID '_Stg' stg '_TrialT1' figformat]); 
         saveas(H,fnm)
         if bigfig == 1
             maximize_figure(H)
@@ -173,25 +180,28 @@ if isbeh
         
         % Lick raster TrialT2
         H = figure;
-	    viewlickTT({animalID sessionID},'TE',TE_behaviour,'TriggerName','StimulusOn','SortEvent',...
-            'TrialStart','eventtype','behav','ShowEvents',{{'StimulusOn'}},...
-            'Partitions','#FirstLick','window',[-5 5],'LickSide','all','TrialType','2');
-        fnm = fullfile(resdir2,[animalID '_' sessionID '_Stg' stg '_TrialT2' figformat]);   % save
+	    viewlickTT({animalID sessionID},'TE',TE_behaviour,'TriggerName',...
+            'StimulusOn','SortEvent','TrialStart','eventtype','behav',...
+            'ShowEvents',{{'StimulusOn'}},'Partitions','#FirstLick',...
+            'window',[-5 5],'LickSide','all','TrialType','2');
+        fnm = fullfile(resdir2,[animalID '_' sessionID '_Stg' stg '_TrialT2' figformat]); 
         saveas(H,fnm)
         if bigfig == 1
             maximize_figure(H)
         end
         close(H)
         
-        StageNum = bynumbers_gamblingtask(animalID,sessionID,'s');
+        disp(['Current stage: Stg ' stg]);
+        disp(['Advance new stage?[Y = 1, N = 0]: ' num2str(StageNum.NextStg)]);
         
      case 3       
         % Lick raster TrialT1
         H = figure;
-	    viewlickTT({animalID sessionID},'TE',TE_behaviour,'TriggerName','StimulusOn','SortEvent',...
-            'TrialStart','eventtype','behav','ShowEvents',{{'StimulusOn'}},...
-            'Partitions','#FirstLick','window',[-5 5],'LickSide','all','TrialType','1');
-        fnm = fullfile(resdir2,[animalID '_' sessionID '_Stg' stg '_TrialT1' figformat]);   % save
+	    viewlickTT({animalID sessionID},'TE',TE_behaviour,'TriggerName',...
+            'StimulusOn','SortEvent','TrialStart','eventtype','behav',...
+            'ShowEvents',{{'StimulusOn'}},'Partitions','#FirstLick',...
+            'window',[-5 5],'LickSide','all','TrialType','1');
+        fnm = fullfile(resdir2,[animalID '_' sessionID '_Stg' stg '_TrialT1' figformat]);
         saveas(H,fnm)
         if bigfig == 1
             maximize_figure(H)
@@ -200,17 +210,16 @@ if isbeh
         
         % Lick raster TrialT2
         H = figure;
-	    viewlickTT({animalID sessionID},'TE',TE_behaviour,'TriggerName','StimulusOn','SortEvent',...
-            'TrialStart','eventtype','behav','ShowEvents',{{'StimulusOn'}},...
-            'Partitions','#FirstLick','window',[-5 5],'LickSide','all','TrialType','2');
-	    fnm = fullfile(resdir2,[animalID '_' sessionID '_Stg' stg '_TrialT2' figformat]);   % save
+	    viewlickTT({animalID sessionID},'TE',TE_behaviour,'TriggerName',...
+            'StimulusOn','SortEvent','TrialStart','eventtype','behav',...
+            'ShowEvents',{{'StimulusOn'}},'Partitions','#FirstLick',...
+            'window',[-5 5],'LickSide','all','TrialType','2');
+	    fnm = fullfile(resdir2,[animalID '_' sessionID '_Stg' stg '_TrialT2' figformat]); 
         saveas(H,fnm)
         if bigfig == 1
             maximize_figure(H)
         end
         close(H)
-        
-        StageNum = bynumbers_gamblingtask(animalID,sessionID,'s');
         
     end   
 end
@@ -222,11 +231,13 @@ if isbeh && isrec
 
     for iC = 1:length(cellids)
         cellid = cellids(iC);
-        if exist(['EVENTSPIKES' cellid{1,1}(end-2) '_' cellid{1,1}(end) '.mat'],'file') == 0 || reTE == 1
+        if exist(['EVENTSPIKES' cellid{1,1}(end-2) '_' cellid{1,1}(end) '.mat'],'file') == 0 ...
+                || reTE == 1
             MakeTrialEvents_gambling(fullpth,'stim')
             try
-                prealignSpikes_gambling(cellid,'FUNdefineEventsEpochs',@defineEventsEpochs_gambling,...
-                    'filetype','event','ifsave',1,'ifappend',0)
+                prealignSpikes_gambling(cellid,'FUNdefineEventsEpochs',...
+                    @defineEventsEpochs_gambling,'filetype','event',...
+                    'ifsave',1,'ifappend',0)
             catch
                 disp('Error in prealignSpikes.');
                 problem_behav_cellid = [problem_behav_cellid cellid];
@@ -238,13 +249,14 @@ if isbeh && isrec
     % Aligning to StimulusOnset, Partition Reward 
     for k = 1:length(cellids)
         H = figure;
-        viewcell2b_gambling(cellids(k),'TriggerName','StimulusOn','SortEvent','TrialStart',...
-            'sigma', 0.07,'eventtype','behav','ShowEvents',{{'DeliverAllFeedback'}},...
-            'Partitions','#Reward','window',[-3 3],'PlotZeroLine','on')
+        viewcell2b_gambling(cellids(k),'TriggerName','StimulusOn','SortEvent',...
+            'TrialStart','sigma', 0.07,'eventtype','behav','ShowEvents',...
+            {{'DeliverAllFeedback'}},'Partitions','#Reward','window',[-3 3],...
+            'PlotZeroLine','on')
         
         cellidt = cellids{k};
         cellidt(cellidt=='.') = '_';
-        fnm = fullfile(resdir,[cellidt '_StimulusOn' figformat]);   % save
+        fnm = fullfile(resdir,[cellidt '_StimulusOn' figformat]);  
         saveas(H,fnm)
         pause(breath)
         if bigfig == 1
@@ -256,7 +268,7 @@ if isbeh && isrec
     % Aligning to Feedback, Partition Reward
     for k = 1:length(cellids)
         H = figure;
-        viewcell2b_gambling(cellids(k),'TriggerName','DeliverAllFeedback',...
+        viewcell2b_gambling(cellids(k),'TriggerName','DeliverFeedback',...
             'SortEvent','TrialStart','sigma', 0.07,'eventtype','behav',...
             'ShowEvents',{{'StimulusOn'}},'Partitions','#Reward','window',[-3 3],...
             'PlotZeroLine','on')
@@ -275,17 +287,19 @@ if isbeh && isrec
     
 end
 
-% Light effects ---------------------------------------------------------
+% Light effects -----------------------------------------------------------
 if isrec && isstim
     % Prealign spikes to stimulus events
     problem_stim_cellid = [];
     for iC = 1:length(cellids)
         cellid = cellids(iC);
-        if exist(['STIMSPIKES' cellid{1,1}(end-2) '_' cellid{1,1}(end) '.mat'],'file') == 0 || reTE == 1
+        if exist(['STIMSPIKES' cellid{1,1}(end-2) '_' cellid{1,1}(end) '.mat'],'file') == 0 ...
+            || reTE == 1
             MakeTrialEvents_gambling(fullpth,'stim')
             try
-                prealignSpikes_gambling(cellid,'FUNdefineEventsEpochs',@defineEventsEpochs_gambling,...
-                    'filetype','stim','ifsave',1,'ifappend',0)
+                prealignSpikes_gambling(cellid,'FUNdefineEventsEpochs',...
+                    @defineEventsEpochs_gambling,'filetype','stim',...
+                    'ifsave',1,'ifappend',0)
             catch
                 disp('Error in prealignSpikes.');
                 problem_stim_cellid = [problem_stim_cellid cellid]; %#ok<AGROW>
@@ -293,7 +307,7 @@ if isrec && isstim
         end
     end
     
-    % View light-triggered raster and PSTH 
+%     % View light-triggered raster and PSTH 
 %     EventColors = [[0.4940 0.1840 0.5560];[0.9290 0.6940 0.1250];...
 %         [0.6350 0.0780 0.1840]]; % Colors for PulseOn, PulseOff, BurstOff
     EventColors = [[1 0 0];[0 1 0];[0 0 1]]; 
@@ -310,7 +324,7 @@ if isrec && isstim
         
         cellidt = cellid{1};
         cellidt(cellidt=='.') = '_';
-        fnm = fullfile(resdir,[cellidt '_PSTH' figformat]);   % save
+        fnm = fullfile(resdir,[cellidt '_PSTH' figformat]); 
         saveas(H,fnm)
         pause(breath)
         if bigfig == 1

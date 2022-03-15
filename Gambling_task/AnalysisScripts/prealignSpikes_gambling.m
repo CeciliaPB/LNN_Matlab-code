@@ -56,7 +56,7 @@ addParameter(prs,'ifsave',false,@(s)islogical(s)|ismember(s,[0 1])) % control sa
 addParameter(prs,'ifappend',true,@(s)islogical(s)|ismember(s,[0 1])) % if true, append new events to preexisting file
 addParameter(prs,'writing_behavior',[],@(s)isempty(s)|...
     ismember(s,{'append','replace','overwrite'})) % if not empty, controls writing behavior
-addParameter(prs,'FUNdefineEventsEpochs',@defineEventsEpochs_default)  % event/epoch definition file
+addParameter(prs,'FUNdefineEventsEpochs',@defineEventsEpochs_gambling)  % event/epoch definition file
 addParameter(prs,'filetype','behav',@(s)ismember(s,{'event' 'behav' 'stim'})) % 'event' ('behav') or 'stim'; determines what type of events to prealigning to
 addParameter(prs,'events',[],@(s)iscell(s)|isempty(s))  % events can be passed directly; definition file is not used
 addParameter(prs,'epochs',[],@(s)iscell(s)|isempty(s))  % epochs can be passed directly; definition file is not used

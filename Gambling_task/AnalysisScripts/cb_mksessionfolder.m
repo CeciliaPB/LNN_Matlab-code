@@ -14,36 +14,47 @@ function cb_mksessionfolder(AnimalID,Task)
 A = dir([AnimalID '_' Task '*.mat']);
 names = {A.name}';
 
+idlist      = {'a' 'b' 'c' 'd' 'e'};
 for ii = 1:length(names)
+    sessionlist = dir('20*');
+    sessionlist = {sessionlist.name}';
     file = names{ii,1};
-    folder = [file(20:end-11) 'a'];
-    
-    if ~exist(folder,'dir') == 1
+    session = file(end-18:end-11);
+    isSession = contains(sessionlist, session);
+    if any(isSession) == 0
+        folder = [file(end-18:end-11) idlist{1}];
         mkdir(folder);
         movefile(file, folder);
-    elseif ~exist(folder,'dir') == 0
-        folder2 = [folder(1:end-1) 'b'];
-        mkdir(folder2);
-        movefile(file, folder2);
+    elseif any(isSession) == 1
+        lastSession = sessionlist(isSession == 1);
+        lastSession = lastSession{end};
+        lastId = find(contains(idlist, lastSession(end)));
+        folder = [file(end-18:end-11) idlist{lastId+1}];
+        mkdir(folder);
+        movefile(file, folder);       
     end
 end
 
-B = dir([AnimalID '_' file(end-18:end-15) '-' file(end-14:end-13)...
-    '-' file(end-12:end-11) '*']);
+B = dir([AnimalID '_20*']);
 names2 = {B.name}';
-B = cell2mat({B.isdir}');
+
+sessionlist = dir('20*');
+sessionlist = {sessionlist.name}';
 for kk = 1:length(names2)
-    for ii = 1:length(names)
-        file = names{ii,1};
-        folder = [file(20:end-11) 'a'];
-        folder2 = [file(20:end-11) 'b'];
-        if kk == 1 && B(kk) == 1 && exist('folder','var')
-            movefile(names2{kk,1}, folder);
-        elseif kk > 1 && B(kk) == 1 && exist('folder2','var')
-            movefile(names2{kk,1}, folder2);
-        else
-            disp('No recording found.');
-        end
+    Part1   = names2{kk}(end-18:end-15);
+    Part2   = names2{kk}(end-13:end-12);
+    Part3   = names2{kk}(end-10:end-9);
+    recSession = [Part1, Part2, Part3];
+    isSession  = contains(sessionlist, recSession);
+    lastRec    = sessionlist(isSession == 1);
+    isRec = dir([lastRec{1} '\' AnimalID '_20*']);
+    if isempty(isRec) == 0
+        disp([lastRec{1} ' already contains a recording.']);
+    elseif isempty(isRec) == 1
+        folder = lastRec{1};
+        movefile(names2{kk,1}, folder);
+    else
+        disp('No recording found.');
     end
 end
 

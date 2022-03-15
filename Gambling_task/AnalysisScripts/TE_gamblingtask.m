@@ -208,7 +208,7 @@ for currentTrial = 1:ntrials
       case 1 % TrainingStage 1  % Feedback: 1 = Reward; 2 = Punishment; 3 = Omission.
         if isfield(SessionData.RawEvents.Trial{1,currentTrial}.States,'StartStimulus')   % free water trials don't have these
             if     TE_behaviour.Feedback(currentTrial) == 2 % Punishment
-                TE_behaviour.DeliverFeedback(currentTrial) = SessionData.RawEvents.Trial{1, currentTrial}.States.Punish(1:1) ;
+                TE_behaviour.DeliverFeedback(currentTrial) = SessionData.RawEvents.Trial{1, currentTrial}.States.Reward(1:1) ;
             elseif TE_behaviour.Feedback(currentTrial) == 1 % Reward
                 if isnan(SessionData.RawEvents.Trial{1,currentTrial}.States.Reward) == 0
                     TE_behaviour.DeliverFeedback(currentTrial) = SessionData.RawEvents.Trial{1, currentTrial}.States.Reward(1:1);
@@ -219,7 +219,7 @@ for currentTrial = 1:ntrials
             end
 
             if     TE_behaviour.Feedback(currentTrial) == 2  % Punishment
-                TE_behaviour.DeliverAllFeedback(currentTrial) = SessionData.RawEvents.Trial{1, currentTrial}.States.Punish(1:1) ;
+                TE_behaviour.DeliverAllFeedback(currentTrial) = SessionData.RawEvents.Trial{1, currentTrial}.States.Reward(1:1) ;
             elseif TE_behaviour.Feedback(currentTrial) == 1 % Reward
                 if isnan(SessionData.RawEvents.Trial{1,currentTrial}.States.Reward) == 0
                     TE_behaviour.DeliverFeedback(currentTrial) = SessionData.RawEvents.Trial{1, currentTrial}.States.Reward(1:1);
@@ -232,7 +232,7 @@ for currentTrial = 1:ntrials
       case 2 % TrainingStage 2
         if isfield(SessionData.RawEvents.Trial{1,currentTrial}.States,'StartStimulus')   % free water trials don't have these
             if     TE_behaviour.Feedback(currentTrial) == 2 % Punishment
-                TE_behaviour.DeliverFeedback(currentTrial) = SessionData.RawEvents.Trial{1, currentTrial}.States.Punish(1:1) ;
+                TE_behaviour.DeliverFeedback(currentTrial) = SessionData.RawEvents.Trial{1, currentTrial}.States.Reward(1:1) ;
             elseif TE_behaviour.Feedback(currentTrial) == 1 % Reward
                 if isnan(SessionData.RawEvents.Trial{1,currentTrial}.States.Reward) == 0
                     TE_behaviour.DeliverFeedback(currentTrial) = SessionData.RawEvents.Trial{1, currentTrial}.States.Reward(1:1);
@@ -243,7 +243,7 @@ for currentTrial = 1:ntrials
             end
 
             if     TE_behaviour.Feedback(currentTrial) == 2  % Punishment
-                TE_behaviour.DeliverAllFeedback(currentTrial) = SessionData.RawEvents.Trial{1, currentTrial}.States.Punish(1:1) ;
+                TE_behaviour.DeliverAllFeedback(currentTrial) = SessionData.RawEvents.Trial{1, currentTrial}.States.Reward(1:1) ;
             elseif TE_behaviour.Feedback(currentTrial) == 1 % Reward
                 if isnan(SessionData.RawEvents.Trial{1,currentTrial}.States.Reward) == 0
                     TE_behaviour.DeliverFeedback(currentTrial) = SessionData.RawEvents.Trial{1, currentTrial}.States.Reward(1:1);

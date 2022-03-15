@@ -7,14 +7,17 @@ function GamblingTask
 %
 % Cecília Pardo-Bellver, 2020
 % Laboratory of Network Neurophysiology
-% Institute of Experimantal Medicine, Hungary.
+% Institute of Experimental Medicine, Hungary.
+% 
+% Mod. 01/2022 CP-B
 % -------------------------------------------------------------------------
 
 % Load Bpod variables
 global BpodSystem
 
 % Define parameters -------------------------------------------------------
-S = BpodSystem.ProtocolSettings; % Load settings chosen in launch manager into current workspace as a struct called S
+% Load settings chosen in launch manager into current workspace as a struct called S
+S = BpodSystem.ProtocolSettings; %#ok<NASGU> 
 S = struct;
 if isempty(fieldnames(S))  % If settings file was an empty struct, populate struct with default settings
     
@@ -37,7 +40,7 @@ if isempty(fieldnames(S))  % If settings file was an empty struct, populate stru
     % GUI parameters. It's interactive, you can change it during the task
     S.GUI.TT1_PanicButon  = 0;  % For Trial Type 1 Imposition
     S.GUI.TT2_PanicButon  = 0;  % For Trial Type 2 Imposition
-    S.GUI.RewardSmall     = 1;  % ul Small reward amount  
+    S.GUI.RewardSmall     = 0.5;  % ul Small reward amount  
     S.GUI.RewardBig       = 8;  % ul Big reward amount 
     S.GUI.SinWavekHz1     = 04; % Cue tone #1 in kHz - tone #1
     S.GUI.SinWavedB1      = 60; % Cue tone #1 dB SPL
@@ -64,7 +67,7 @@ if isempty(fieldnames(S))  % If settings file was an empty struct, populate stru
     S.TT1_Panic     = S.GUI.TT1_PanicButon; % For Trial Type 1 Imposition
     S.TT2_Panic     = S.GUI.TT2_PanicButon; % For Trial Type 2 Imposition
     S.SafeProb      = 0.95; % Safe side, probability reward, 5% Omiss ion
-    S.RiskProb      = 0.55; % Risky side - 65% big reward , 5% Omission
+    S.RiskProb      = 0.70; % Risky side - 65% big reward , 5% Omission
     S.PunishProb    = 1 - (S.RiskProb + 0.05); % PunishProb = 30% punishment
 end
 % Initialize parameter GUI plugin
@@ -83,7 +86,7 @@ Tg2         = S.GUI.SinWavedB2;     % Wanted dB for tone 2
 TgWN        = 95;                   % Wanted dB for WN
 Fr1         = S.GUI.SinWavekHz1;    % Wanted kHz for tone 1
 Fr2         = S.GUI.SinWavekHz2;    % Wanted kHz for tone 2
-FrWN        = 22;                   % CHECK! Because the WhiteNoise is saved at the 223nd during the calibration (for me, having done it for 21 tracks)
+FrWN        = 22;                   % CHECK! Because the WhiteNoise is saved at the 22nd during the calibration
 SPL1        = TeensyCalData.SPL(Fr1);   % Recalls calibrated dB for the frequency of tone 1
 SPL2        = TeensyCalData.SPL(Fr2);   % Recalls calibrated dB for the frequency of tone 2
 SPLWN       = TeensyCalData.SPL(FrWN);  % Recalls calibrated dB for the WhiteNoise
@@ -120,7 +123,7 @@ end
 BpodSystem.Data.TrialTypes = []; % The trial type of each trial completed will be added here.
 
 % Defining outcome contingencies, up to 20 are random, but in Stage 1 -----
-p = rand([1,length(Trials)]);        % Control outcome contingencies
+p = rand([1,length(Trials)]);     % Control outcome contingencies
 UsOutcome1 = zeros(size(Trials)); % Safe side outcome
 UsOutcome2 = zeros(size(Trials)); % Risky side outcome
 if     S.TrainingStage == 3 
@@ -135,21 +138,37 @@ elseif S.TrainingStage == 1
 end
 
 % Define delays (between Delaymin and Delaymax in s) ----------------------
-    if     S.TrainingStage == 2
-        Delaymin = 6; 
-        Delaymax = 9; 
-    elseif S.TrainingStage == 3
-        Delaymin = 2; 
-        Delaymax = 5; 
-    elseif S.TrainingStage == 1
-        Delaymin = 1; 
-        Delaymax = 2; 
-    end
+rng('shuffle');
+if     S.TrainingStage == 2
+    Delaymin = 6;
+    Delaymax = 9;
+elseif S.TrainingStage == 3
+    Delaymin = 2;
+    Delaymax = 5;
+elseif S.TrainingStage == 1
+    Delaymin = 0;
+    Delaymax = 0;
+end
 Delay = randi([Delaymin, Delaymax], 1, MaxTrials);
 BpodSystem.Data.Delay = Delay;
 
+% Define feedback delay (between Delaymin and Delaymax in s) --------------
+if     S.TrainingStage == 2
+    FDelaymin = 0.100;
+    FDelaymax = 0.300;
+elseif S.TrainingStage == 3
+    FDelaymin = 0.200;
+    FDelaymax = 0.400;
+elseif S.TrainingStage == 1
+    FDelaymin = 0;
+    FDelaymax = 0;
+end
+FDelay = FDelaymin + (FDelaymax - FDelaymin)*sum(rand(MaxTrials,3),2)/3;
+BpodSystem.Data.FDelay = FDelay;
+
 % Initialize plots --------------------------------------------------------
-BpodSystem.ProtocolFigures.OutcomePlotFig = figure('Position', [600 600 1100 250],'Name','Outcome plot','numbertitle','off', 'MenuBar', 'none', 'Resize', 'off');
+BpodSystem.ProtocolFigures.OutcomePlotFig = figure('Position', [600 600 1100 250],...
+    'Name','Outcome plot','numbertitle','off', 'MenuBar', 'none', 'Resize', 'off');
 BpodSystem.GUIHandles.OutcomePlot = axes('Position', [0.1300 0.3 0.7750 0.60]);
 if S.TrainingStage ==1 || S.TrainingStage ==2
     OutcomePlot_Gambling12(BpodSystem.GUIHandles.OutcomePlot,'init',1-TrialType, UsOutcome1);
@@ -160,25 +179,24 @@ end
 % Initialize reward display -----------------------------------------------
 TotalRewardDisplay('init');
 
-% Training stage 1 --------------------------------------------------------
+% Training stage 1 ========================================================
 if S.TrainingStage == 1 % Training to lick L & R
           
     for currentTrial = 1:MaxTrials
         
-            S = BpodParameterGUI('sync', S); % Sync parameters with BpodParameterGUI plugin
-
+        S = BpodParameterGUI('sync', S); % Sync parameters with BpodParameterGUI plugin
+        
         % GUI Update ------------------------------------------------------
         % Controls if parameters for Water reward are changed: if so, it is modified accordingly
         % 1) Check changes in the water rewarded
-            newRewardSmall  = S.GUI.RewardSmall; % ul Small reward amount
-            if ~isequal(S.RewardAmountS,newRewardSmall) 
-                S.RewardAmountS = newRewardSmall;            
-            end
-            S.RewardTimeRS  = GetValveTimes(S.RewardAmountS, 3); % Small reward valve time for right valve
-            S.RewardTimeLS  = GetValveTimes(S.RewardAmountS, 1); % Small reward valve time fot left valve
-        
-        % Sync parameters with BpodParameterGUI plugin
-            S = BpodParameterGUI('sync', S); 
+        newRewardSmall  = S.GUI.RewardSmall; % ul Small reward amount
+        if ~isequal(S.RewardAmountS,newRewardSmall)
+            S.RewardAmountS = newRewardSmall;
+        end
+        S.RewardTimeRS  = GetValveTimes(S.RewardAmountS, 3); % Small reward valve time for right valve
+        S.RewardTimeLS  = GetValveTimes(S.RewardAmountS, 1); % Small reward valve time fot left valve
+        % 2) Sync parameters with BpodParameterGUI plugin
+        S = BpodParameterGUI('sync', S);
         
         % Trial conditions ------------------------------------------------
         if     TrialType(currentTrial) == 1
@@ -206,7 +224,12 @@ if S.TrainingStage == 1 % Training to lick L & R
        
         sma = AddState(sma,'Name','WaitforLick',...
             'Timer',0,...
-            'StateChangeConditions',{PortCode,'Reward'},...
+            'StateChangeConditions',{PortCode,'FeedBackDelay'},...
+            'OutputActions',{});
+        
+        sma = AddState(sma,'Name','FeedBackDelay',...
+            'Timer',FDelay(currentTrial),...
+            'StateChangeConditions',{'Tup','Reward'},...
             'OutputActions',{});
         
         sma = AddState(sma,'Name','PostUS',...
@@ -223,12 +246,18 @@ if S.TrainingStage == 1 % Training to lick L & R
         
         % Update trial data -----------------------------------------------
         if ~isempty(fieldnames(RawEvents)) % If trial data was returned
-            BpodSystem.Data                             = AddTrialEvents(BpodSystem.Data,RawEvents); % Computes trial events from raw data
-            BpodSystem.Data.TrialSettings(currentTrial) = S; % Adds the settings used for the current trial to the Data struct (to be saved after the trial ends)
-            BpodSystem.Data.TrialTypes(currentTrial)    = TrialType(currentTrial); % Adds the trial type of the current trial to data
-            Outcomes                                    = UpdateOutcomePlot(TrialType, BpodSystem.Data, UsOutcome1); % update outcome plot
-            BpodSystem.Data.TrialOutcome(currentTrial)  = Outcomes(currentTrial);
-            SaveBpodSessionData; % Saves the field BpodSystem.Data to the current data file
+            % Computes trial events from raw data
+            BpodSystem.Data = AddTrialEvents(BpodSystem.Data,RawEvents); 
+            % Adds the settings used for the current trial to the Data struct
+            BpodSystem.Data.TrialSettings(currentTrial) = S; 
+            % Adds the trial type of the current trial to data
+            BpodSystem.Data.TrialTypes(currentTrial) = TrialType(currentTrial); 
+            % Update outcome plot
+            Outcomes = UpdateOutcomePlot(TrialType, BpodSystem.Data, UsOutcome1);
+            % Adds the outcome of the current trial to data
+            BpodSystem.Data.TrialOutcome(currentTrial) = Outcomes(currentTrial);
+            % Saves the field BpodSystem.Data to the current data file
+            SaveBpodSessionData;
         end
         
         HandlePauseCondition;
@@ -256,7 +285,7 @@ if S.TrainingStage == 1 % Training to lick L & R
     end
 end
 
-% Training stage 2 --------------------------------------------------------
+% Training stage 2 ========================================================
 if S.TrainingStage == 2 %introducing a cue and delay
     
     for currentTrial = 1:MaxTrials
@@ -287,7 +316,6 @@ if S.TrainingStage == 2 %introducing a cue and delay
             Tg2       = newTg2;
             Fr2       = newFr2;
         end
-        
         % 2) Check changes in the water rewarded
         newRewardSmall  = S.GUI.RewardSmall; % ul Small reward amount
         newRewardBig    = S.GUI.RewardBig; % ul Big reward amount
@@ -297,7 +325,6 @@ if S.TrainingStage == 2 %introducing a cue and delay
         end
         S.RewardTimeRS  = GetValveTimes(S.RewardAmountS, 3); % Small reward valve time for right valve
         S.RewardTimeLS  = GetValveTimes(S.RewardAmountS, 1); % Small reward valve time fot left valve
-        
         % 3) Check TrialType imposition
         TT1_PanicButon = S.GUI.TT1_PanicButon; % For Trial Type 1 Imposition
         TT2_PanicButon = S.GUI.TT2_PanicButon; % For Trial Type 2 Imposition
@@ -305,15 +332,13 @@ if S.TrainingStage == 2 %introducing a cue and delay
             S.TT1_Panic = TT1_PanicButon;
             S.TT2_Panic = TT2_PanicButon;
         end
-        
         % 4) Check WN panic button
         WNPanic = S.GUI.WhiteWave;
-        if     WNPanic == 1
+        if WNPanic == 1
             AudioPanic = 1;
         else 
         end
-        
-        % Sync parameters with BpodParameterGUI plugin
+        % 5) Sync parameters with BpodParameterGUI plugin
         S = BpodParameterGUI('sync', S); 
         
         % Trial Type decision ---------------------------------------------
@@ -326,10 +351,15 @@ if S.TrainingStage == 2 %introducing a cue and delay
         end
         
         if currentTrial > 20
+            LastTrials = sum(TrialType(currentTrial-5:currentTrial-1));
             if     TT1_PanicButon == 1 || Correction == 1
                 TrialType(currentTrial) = 1;
             elseif TT2_PanicButon == 1 || Correction == 2
                 TrialType(currentTrial) = 2;
+            elseif LastTrials == 5
+                TrialType(currentTrial) = 2;
+            elseif LastTrials == 10
+                TrialType(currentTrial) = 1;
             else 
                 TrialType(currentTrial) = ceil(rand(1,1)*2);
             end
@@ -374,16 +404,21 @@ if S.TrainingStage == 2 %introducing a cue and delay
         sma = AddState(sma, 'Name', 'ITI', ...
             'Timer',S.ITI,...
             'StateChangeConditions', {'Tup', 'StartStimulus','Port1In','RestartNoLick', 'Port3In','RestartNoLick'},...
-            'OutputActions', {});  % 1 + exponential foreperiod < 4s
+            'OutputActions', {});  
         
         sma = AddState(sma, 'Name', 'StartStimulus', ...
             'Timer', S.SoundDuration,...
-            'StateChangeConditions', {PortCondition,'Reward','Tup','Delay'},...
+            'StateChangeConditions', {PortCondition,'FeedBackDelay','Tup','Delay'},...
             'OutputActions', {'TeensyAudio1', Audio, 'BNC2', 1});   
+        
+        sma = AddState(sma,'Name','FeedBackDelay',...
+            'Timer',FDelay(currentTrial),...
+            'StateChangeConditions',{'Tup','Reward'},...
+            'OutputActions',{});
         
         sma = AddState(sma, 'Name','Delay', ...
             'Timer', Delay(currentTrial),...
-            'StateChangeConditions', {PortCondition,'Reward','Tup','PostUS'},...
+            'StateChangeConditions', {PortCondition,'FeedBackDelay','Tup','PostUS'},...
             'OutputActions', {});
         
         sma = AddState(sma,'Name', 'Reward', ...
@@ -394,7 +429,7 @@ if S.TrainingStage == 2 %introducing a cue and delay
         sma = AddState(sma,'Name','PostUS',...
             'Timer',1,...
             'StateChangeConditions',{PortCondition,'ResetDrinkingTimer', 'Tup','exit'},...
-            'OutputActions',{'BNC2', 0});   % drinking
+            'OutputActions',{'BNC2', 0});   
         
         sma = AddState(sma,'Name','ResetDrinkingTimer',...
             'Timer',0,...
@@ -405,12 +440,18 @@ if S.TrainingStage == 2 %introducing a cue and delay
         
         % Update trial data -----------------------------------------------
         if ~isempty(fieldnames(RawEvents)) % If trial data was returned
-            BpodSystem.Data                             = AddTrialEvents(BpodSystem.Data,RawEvents); % Computes trial events from raw data
-            BpodSystem.Data.TrialSettings(currentTrial) = S; % Adds the settings used for the current trial to the Data struct (to be saved after the trial ends)
-            BpodSystem.Data.TrialTypes(currentTrial)    = TrialType(currentTrial); % Adds the trial type of the current trial to data
-            Outcomes                                    = UpdateOutcomePlot(TrialType, BpodSystem.Data, UsOutcome1); % update outcome plot
-            BpodSystem.Data.TrialOutcome(currentTrial)  = Outcomes(currentTrial);
-            SaveBpodSessionData; % Saves the field BpodSystem.Data to the current data file    
+            % Computes trial events from raw data
+            BpodSystem.Data = AddTrialEvents(BpodSystem.Data,RawEvents); 
+            % Adds the settings used for the current trial to the Data struct
+            BpodSystem.Data.TrialSettings(currentTrial) = S; 
+            % Adds the trial type of the current trial to data
+            BpodSystem.Data.TrialTypes(currentTrial) = TrialType(currentTrial); 
+            % Update outcome plot
+            Outcomes = UpdateOutcomePlot(TrialType, BpodSystem.Data, UsOutcome1); 
+            % Adds the outcome of the current trial to data
+            BpodSystem.Data.TrialOutcome(currentTrial) = Outcomes(currentTrial);
+            % Saves the field BpodSystem.Data to the current data file 
+            SaveBpodSessionData;    
         end
         
         HandlePauseCondition;
@@ -438,7 +479,7 @@ if S.TrainingStage == 2 %introducing a cue and delay
     end    
 end
 
-% Training stage 3 --------------------------------------------------------
+% Training stage 3 ========================================================
 if S.TrainingStage == 3 %introducing a cue and delay
     
     for currentTrial = 1:MaxTrials
@@ -446,7 +487,7 @@ if S.TrainingStage == 3 %introducing a cue and delay
         S = BpodParameterGUI('sync', S); % Synchronize the GUI
         
         % GUI Update ------------------------------------------------------
-        % Controls if parameters for Tone/ Water reward are changed: if so, it is modified accordingly
+        % Controls if parameters for Tone/ WaterReward are changed: if so, it is modified
         % 1) Check cahnges in the audio
         newTg1 = S.GUI.SinWavedB1;
         newTg2 = S.GUI.SinWavedB2;
@@ -469,7 +510,6 @@ if S.TrainingStage == 3 %introducing a cue and delay
             Tg2       = newTg2;
             Fr2       = newFr2;
         end
-        
         % 2) Check changes in the water rewarded
         newRewardSmall  = S.GUI.RewardSmall; % ul Small reward amount
         newRewardBig    = S.GUI.RewardBig; % ul Big reward amount
@@ -479,7 +519,6 @@ if S.TrainingStage == 3 %introducing a cue and delay
         end
         S.RewardTimeRS  = GetValveTimes(S.RewardAmountS, 3); % Small reward valve time for right valve
         S.RewardTimeLS  = GetValveTimes(S.RewardAmountS, 1); % Small reward valve time fot left valve
-        
         % 3) Check TrialType imposition
         TT1_PanicButon = S.GUI.TT1_PanicButon; % For Trial Type 1 Imposition
         TT2_PanicButon = S.GUI.TT2_PanicButon; % For Trial Type 2 Imposition
@@ -487,15 +526,13 @@ if S.TrainingStage == 3 %introducing a cue and delay
             S.TT1_Panic = TT1_PanicButon;
             S.TT2_Panic = TT2_PanicButon;
         end
-        
         % 4) Check WN panic button
         WNPanic = S.GUI.WhiteWave;
-        if     WNPanic == 1
+        if WNPanic == 1
             AudioPanic = 1;
         else 
         end
-        
-        % Sync parameters with BpodParameterGUI plugin
+        % 5) Sync parameters with BpodParameterGUI plugin
         S = BpodParameterGUI('sync', S); 
         
         % Trial Type decision ---------------------------------------------
@@ -508,10 +545,14 @@ if S.TrainingStage == 3 %introducing a cue and delay
         end
         
         if currentTrial > 20
-            LastTrials = sum(TrialType(currentTrial-6):TrialType(currentTrial-1));
-            if     TT1_PanicButon == 1 || Correction == 1
+            LastTrials = sum(TrialType(currentTrial-5:currentTrial-1));
+            if     TT1_PanicButon == 1 
                 TrialType(currentTrial) = 1;
-            elseif TT2_PanicButon == 1 || Correction == 2
+            elseif TT2_PanicButon == 1 
+                TrialType(currentTrial) = 2;
+            elseif Correction == 1
+                TrialType(currentTrial) = 1;
+            elseif Correction == 2
                 TrialType(currentTrial) = 2;
             elseif LastTrials == 5
                 TrialType(currentTrial) = 2;
@@ -524,18 +565,25 @@ if S.TrainingStage == 3 %introducing a cue and delay
         end
         
         % UsOutcome decision ----------------------------------------------
-        clearvars A B
+        clearvars A B p
+        if currentTrial/5 == round(currentTrial/5)
+            rng('shuffle');
+        end
         A = 0;
         B = 0;
         if currentTrial > 20
             p = rand(1,1);
-            if p >= (1- S.SafeProb)
+            if UsOutcome1(currentTrial-1) == 0
+                A = 1;
+            elseif p >= (1- S.SafeProb)
                 A = 1;
             end
-            if p <= S.RiskProb
+            if UsOutcome2(currentTrial-1) == 0
                 B = 2;             
-            elseif p <= (S.RiskProb + S.PunishProb)&& p > S.RiskProb
+            elseif p <= (S.RiskProb + S.PunishProb) && p > S.RiskProb
                 B = 3;
+            elseif p <= S.RiskProb
+                B = 2;
             end
             UsOutcome1(currentTrial) = A; % Safe side outcome
             UsOutcome2(currentTrial) = B; % Risk side outcome
@@ -605,8 +653,18 @@ if S.TrainingStage == 3 %introducing a cue and delay
         
         sma = AddState(sma, 'Name', 'StartStimulus', ...
             'Timer', S.SoundDuration,...
-            'StateChangeConditions', {SafePort,SafePortArgument,RiskyPort,RiskyPortArgument,'Tup','Delay'},...
-            'OutputActions', {'TeensyAudio1', Audio, 'BNC2', 1});  
+            'StateChangeConditions', {SafePort,'SafeFeedBackDelay',RiskyPort,'RiskFeedBackDelay','Tup','Delay'},...
+            'OutputActions', {'TeensyAudio1', Audio, 'BNC2', 1});
+        
+        sma = AddState(sma,'Name','SafeFeedBackDelay',...
+            'Timer',FDelay(currentTrial),...
+            'StateChangeConditions',{'Tup',SafePortArgument},...
+            'OutputActions',{});
+        
+        sma = AddState(sma,'Name','RiskFeedBackDelay',...
+            'Timer',FDelay(currentTrial),...
+            'StateChangeConditions',{'Tup',RiskyPortArgument},...
+            'OutputActions',{});
         
         sma = AddState(sma, 'Name','Delay', ...
             'Timer', Delay(currentTrial),...
@@ -642,12 +700,18 @@ if S.TrainingStage == 3 %introducing a cue and delay
         
         % Update trial data -----------------------------------------------
         if ~isempty(fieldnames(RawEvents)) % If trial data was returned
-            BpodSystem.Data                             = AddTrialEvents(BpodSystem.Data,RawEvents); % Computes trial events from raw data
-            BpodSystem.Data.TrialSettings(currentTrial) = S; % Adds the settings used for the current trial to the Data struct (to be saved after the trial ends)
-            BpodSystem.Data.TrialTypes(currentTrial)    = TrialType(currentTrial); % Adds the trial type of the current trial to data
-            Outcomes                                    = UpdateOutcomePlot2(TrialType, BpodSystem.Data, UsOutcome1, UsOutcome2); % update outcome plot
-            BpodSystem.Data.TrialOutcome(currentTrial)  = Outcomes(currentTrial);
-            SaveBpodSessionData; % Saves the field BpodSystem.Data to the current data file
+            % Computes trial events from raw data
+            BpodSystem.Data = AddTrialEvents(BpodSystem.Data,RawEvents); 
+            % Adds the settings used for the current trial to the Data struct
+            BpodSystem.Data.TrialSettings(currentTrial) = S; 
+            % Adds the trial type of the current trial to data
+            BpodSystem.Data.TrialTypes(currentTrial) = TrialType(currentTrial); 
+            % Update outcome plot
+            Outcomes = UpdateOutcomePlot2(TrialType, BpodSystem.Data, UsOutcome1, UsOutcome2);
+            % Adds the outcome of the current trial to data
+            BpodSystem.Data.TrialOutcome(currentTrial) = Outcomes(currentTrial);
+            % Saves the field BpodSystem.Data to the current data file
+            SaveBpodSessionData; 
         end
         
         HandlePauseCondition;
@@ -695,7 +759,8 @@ for x = 1:Data.nTrials
         Outcomes(x) = 0;   % omission
     end
 end
-OutcomePlot_Gambling12(BpodSystem.GUIHandles.OutcomePlot,'update',Data.nTrials+1,1-TrialType,Outcomes, UsOutcome)
+OutcomePlot_Gambling12(BpodSystem.GUIHandles.OutcomePlot,'update',...
+    Data.nTrials+1,1-TrialType,Outcomes, UsOutcome)
 end
 
 % -------------------------------------------------------------------------
@@ -757,7 +822,8 @@ for x = 1:Data.nTrials
     end
     
 end
-OutcomePlot_Gambling(BpodSystem.GUIHandles.OutcomePlot,'update',Data.nTrials+1,1-TrialType, 1-Choice ,Outcomes, [UsOutcome1;UsOutcome2])
+OutcomePlot_Gambling(BpodSystem.GUIHandles.OutcomePlot,'update',...
+    Data.nTrials+1,1-TrialType, 1-Choice ,Outcomes, [UsOutcome1;UsOutcome2])
 end
 
 % -------------------------------------------------------------------------
